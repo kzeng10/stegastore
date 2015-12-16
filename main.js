@@ -13,28 +13,55 @@ var flickrOptions = {
   authenticated: true
 };
 var flickrapi;
+//because flickr is dumb and only gives ids, no names
+var photoset_ids = {}; //name : id
+var photo_ids = {}; //name : id
 
-//upload everything in upload folder
+//upload everything in upload folder in specified photoset
 
-// Flickr.authenticate(flickrOptions, function(error, flickr) {
-//   var uploadOptions = { photos: fs.readdirSync("upload").filter(function (fileName) {return fileName.split(".")[0] !== '';}).map(function (fileName) {
-//     return {
-//       title: fileName.split(".")[0],
-//       tags: [fileName.split(".")[0]],
-//       is_public: 0,
-//       is_friend: 0,
-//       is_family: 0,
-//       photo: path.join(__dirname, "/upload/"+fileName)
-//     }
-//   })};
-//   Flickr.upload(uploadOptions, flickrOptions, function(error, result) {
-//     if(error) {
-//       return console.error(error);
-//     }
-//     console.log("photos uploaded", result);
-//   });
-// });
+function upload(photoset) {
+  Flickr.authenticate(flickrOptions, function(error, flickr) {
+    var uploadOptions = { photos: fs.readdirSync("upload").filter(function (fileName) {return fileName.split(".")[0] !== '';}).map(function (fileName) {
+      return {
+        title: fileName.split(".")[0],
+        tags: [fileName.split(".")[0]],
+        is_public: 0,
+        is_friend: 0,
+        is_family: 0,
+        photo: path.join(__dirname, "/upload/"+fileName)
+      }
+    })};
+    Flickr.upload(uploadOptions, flickrOptions, function(error, photo_ids) {
+      if(error) { console.log(error.stack);}
+      if(photoset) {
+        //move to specified photoset
+        photo_ids.forEach(function (photo_id) {
+          flickr.photosets.addPhoto(_.extend(flickrOptions, {
+            photoset_id: photoset_ids[photoset],
+            photo_id: photo_id
+          }),
+            function(error) { if(error) console.log(error);}
+          );
+        });
+      } else {
+        //create photoset with first image, then add rest in
+        flickr.photosets.create(_.extend(flickrOptions, {title: Date.now(), primary_photo_id: photo_ids[0]}), function(error, result) {
+          if(error) {console.log(error.stack);}
+          for(var i = 1; i<photo_ids.length; i++) {
+            flickr.photosets.addPhoto(_.extend(flickrOptions, {
+              photoset_id: result.photoset.id,
+              photo_id: photo_ids[i]
+            }),
+              function(error) { if(error) console.log(error.stack());}
+            );
+          }
+        });
+      }
+    });
+  });
+}
 
+upload();
 
 // downloads all photos of user, then unzips all of them into downloads folder
 // todo:
