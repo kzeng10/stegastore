@@ -12,7 +12,6 @@ var flickrOptions = {
   user_id: "me",
   authenticated: true
 };
-var flickrapi;
 //because flickr is dumb and only gives ids, no names
 var photoset_ids = {}; //name : id
 var photo_ids = {}; //name : id
@@ -69,35 +68,66 @@ var photo_ids = {}; //name : id
 function download(photoset) {
   Flickr.authenticate(flickrOptions, function(error, flickr) {
     _.extend(flickrOptions, flickr.options);
-    flickrapi = flickr;
-    flickr.people.getPhotos(_.extend(flickrOptions, {extras: "url_o"}), function(error, result) {
-      result.photos.photo.forEach(function(photoMeta) {
-        var file = fs.createWriteStream(photoMeta.title + ".tmp");
-        request
-          .get(photoMeta.url_o)
-          .on('error', function(err) {
-            console.log(err);
-          })
-          .pipe(file)
-          .on('finish', function(err) {
-            if(err) console.log(err);
-            else {
-              console.log("wrote " + photoMeta.title);
-              console.log("beginning unzip of " + photoMeta.title);
-              exec("unzip -u "+photoMeta.title+".tmp -d download", function(error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-                if (error !== null) {
-                  console.log('exec error: ' + error);
-                }
-                exec("rm "+photoMeta.title+".tmp", function(error, stdout, stderr) {
-                  console.log("removed file "+photoMeta.title);
+    //i hate callbacks, how to DRY-ify?
+    if(photoset && photoset_ids[photoset]) {
+      flickr.photosets.getPhotos(_.extend(flickrOptions, {extras: "url_o", photoset_id: photoset_ids[photoset]}), function(error, result) {
+        result.photos.photo.forEach(function(photoMeta) {
+          var file = fs.createWriteStream(photoMeta.title + ".tmp");
+          request
+            .get(photoMeta.url_o)
+            .on('error', function(err) {
+              console.log(err);
+            })
+            .pipe(file)
+            .on('finish', function(err) {
+              if(err) console.log(err);
+              else {
+                console.log("wrote " + photoMeta.title);
+                console.log("beginning unzip of " + photoMeta.title);
+                exec("unzip -u "+photoMeta.title+".tmp -d download", function(error, stdout, stderr) {
+                  console.log('stdout: ' + stdout);
+                  console.log('stderr: ' + stderr);
+                  if (error !== null) {
+                    console.log('exec error: ' + error);
+                  }
+                  exec("rm "+photoMeta.title+".tmp", function(error, stdout, stderr) {
+                    console.log("removed file "+photoMeta.title);
+                  });
                 });
-              });
-            }
-          });
+              }
+            });
+        });
       });
-    });
+    } else {
+      flickr.people.getPhotos(_.extend(flickrOptions, {extras: "url_o"}), function(error, result) {
+        result.photos.photo.forEach(function(photoMeta) {
+          var file = fs.createWriteStream(photoMeta.title + ".tmp");
+          request
+            .get(photoMeta.url_o)
+            .on('error', function(err) {
+              console.log(err);
+            })
+            .pipe(file)
+            .on('finish', function(err) {
+              if(err) console.log(err);
+              else {
+                console.log("wrote " + photoMeta.title);
+                console.log("beginning unzip of " + photoMeta.title);
+                exec("unzip -u "+photoMeta.title+".tmp -d download", function(error, stdout, stderr) {
+                  console.log('stdout: ' + stdout);
+                  console.log('stderr: ' + stderr);
+                  if (error !== null) {
+                    console.log('exec error: ' + error);
+                  }
+                  exec("rm "+photoMeta.title+".tmp", function(error, stdout, stderr) {
+                    console.log("removed file "+photoMeta.title);
+                  });
+                });
+              }
+            });
+        });
+      });
+    }
   });
 }
 
