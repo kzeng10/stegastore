@@ -17,17 +17,22 @@ var flickrOptions = {
 var photoset_ids = {}; //name : id
 var photo_ids = {}; //name : id
 
-// Flickr.authenticate(flickrOptions, function(error, flickr) {
-//   _.extend(flickrOptions, flickr.options);
-//   //update photoset_ids
-//   flickr.photosets.getList(flickrOptions, function(error, results) {
-//     results.photosets.photoset.forEach(function(meta) {
-//       photoset_ids[meta.title._content] =  meta.id;
-//     });
-//   });
-//   // upload(flickr, 'test');
+Flickr.authenticate(flickrOptions, function(error, flickr) {
+  _.extend(flickrOptions, flickr.options);
+  upload = upload.bind(this, flickr);
+  download = download.bind(this, flickr);
+  //update photoset_ids
+  flickr.photosets.getList(flickrOptions, function(error, results) {
+    results.photosets.photoset.forEach(function(meta) {
+      photoset_ids[meta.title._content] =  meta.id;
+    });
+    convertToStega('0926151802.jpg', 'Photos-3');
+    convertToStega('Photos-2 copy', 'testing1');
+    convertToStega('test1.pdf');
+  });
+  // upload('test');
 
-// });
+});
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
 // files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting
@@ -45,7 +50,7 @@ function convert() {
   })
 }
 
-// hide individual file/folder at given dir into a stega-file and move to upload
+// hide individual file/folder at given dir into a stega-file and move to upload, then uploads
 function convertToStega(item, parentFolder) {
   // create parentFolder in tmp and upload
   exec('mkdir "'+path.join('tmp/'+(parentFolder || 'root'))+'" ; '+'mkdir "'+path.join('upload/'+(parentFolder || 'root'))+'"', shellhelper.bind(this, function() {
@@ -56,18 +61,17 @@ function convertToStega(item, parentFolder) {
         // remove old file in tmp
         exec('rm "'+path.join('tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
           console.log('finished!');
+          upload(parentFolder, parentFolder); //keep photoset names the same as their folder name
         }));
       }));
     }));
   }));
 }
-convertToStega('0926151802.jpg', 'Photos-2');
-convertToStega('Photos-2 copy', 'testing');
-convertToStega('test.pdf');
+
 
 // upload everything in upload (or specified) folder to specified photoset
 function upload(flickr, folderName, photoset) {
-  folderDir = path.join(__dirname, 'upload/'+(folderName || ''));
+  folderDir = path.join(__dirname, 'upload/'+(folderName || 'root'));
   var uploadOptions = { photos: fs.readdirSync(folderDir).filter(function (fileName) {return fileName.split('.')[0] !== '';}).map(function (fileName) {
     return {
       title: fileName.split('.')[0],
