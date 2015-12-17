@@ -41,6 +41,7 @@ function convert() {
   fs.readdir(path.join(__dirname, 'raw_files'), function(err, items) {
     // get rid of hidden files
     items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join('raw_files', item)});
+
     //for each item,
     //if fileName.split('.')[0] === '', continue (ignore hidden files)
     //if file, convertToStega(fileName)
@@ -53,33 +54,33 @@ function convert() {
     items.filter(function(item) {
       return fs.statSync(item).isFile();
     }).forEach(function(file) {
-      console.log(file);
+      convertToStega(path.basename(file));
     });
 
     // folders in root
     items.filter(function(item) {
       return fs.statSync(item).isDirectory();
-    }).forEach(function(folder) {
-      fs.readdir(path.join(__dirname, folder), function(err, items) {
-        items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join(folder, item)});
+    }).forEach(function(parentFolder) {
+      fs.readdir(path.join(__dirname, parentFolder), function(err, items) {
+        items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join(parentFolder, item)});
         // files in folder
         items.filter(function(item) {
           return fs.statSync(item).isFile();
         }).forEach(function(file) {
-          console.log(file);
+          convertToStega(path.basename(file), path.basename(parentFolder));
         });
 
         // folders in folder
         items.filter(function(item) {
           return fs.statSync(item).isDirectory();
-        }).forEach(function(file) {
-          console.log(file);
+        }).forEach(function(folder) {
+          convertToStega(path.basename(folder), path.basename(parentFolder));
         });
       });
     });
   })
 }
-convert();
+// convert();
 
 // hide individual file/folder at given dir into a stega-file and move to upload, then uploads
 function convertToStega(item, parentFolder) {
@@ -92,7 +93,7 @@ function convertToStega(item, parentFolder) {
         // remove old file in tmp
         exec('rm "'+path.join('tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
           console.log('finished!');
-          upload(parentFolder, parentFolder); //keep photoset names the same as their folder name
+          // upload(parentFolder, parentFolder); //keep photoset names the same as their folder name
         }));
       }));
     }));
