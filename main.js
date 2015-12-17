@@ -36,7 +36,8 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
     // convertToStega('Photos-2 copy', 'testing1');
     // convertToStega('test1.pdf');
   });
-  // upload('testing1');
+  upload('testing1');
+  upload('root', 'test1.pdf.png');
 });
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
@@ -106,11 +107,11 @@ function convertToStega(item, parentFolder) {
   }));
 }
 
-
-// upload everything in specified folder to specified photoset (of the same name)
-function upload(flickr, folderName) {
+// upload everything (or specified file) in specified folder to specified photoset (of the same name)
+function upload(flickr, folderName, file) {
   folderDir = path.join(__dirname, 'upload', folderName);
-  var uploadOptions = { photos: fs.readdirSync(folderDir).filter(function (fileName) {return fileName.split('.')[0] !== '';}).map(function (fileName) {
+  var uploadOptions = {
+    photos: fs.readdirSync(folderDir).filter(function (fileName) {return fileName.split('.')[0] !== '' && (file ? fileName === file : true);}).map(function (fileName) {
     return {
       title: fileName.split('.')[0],
       tags: [fileName.split('.')[0]],
