@@ -39,6 +39,8 @@ var photo_ids = {}; //name : id
 function convert() {
   //basically run convertToStega on every file/folder in raw_files
   fs.readdir(path.join(__dirname, 'raw_files'), function(err, items) {
+    // get rid of hidden files
+    items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join('raw_files', item)});
     //for each item,
     //if fileName.split('.')[0] === '', continue (ignore hidden files)
     //if file, convertToStega(fileName)
@@ -46,11 +48,35 @@ function convert() {
     //  for each item,
     //    if file, convertToStega(itemName, folderName)
     //    if folder, convertToStega(itemName, folderName)
+
+    // files in root
     items.filter(function(item) {
-      return item.split('.')[0] !== '';
-    }).forEach(function(item) {
-      console.log(item);
-    })
+      return fs.statSync(item).isFile();
+    }).forEach(function(file) {
+      console.log(file);
+    });
+
+    // folders in root
+    items.filter(function(item) {
+      return fs.statSync(item).isDirectory();
+    }).forEach(function(folder) {
+      fs.readdir(path.join(__dirname, folder), function(err, items) {
+        items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join(folder, item)});
+        // files in folder
+        items.filter(function(item) {
+          return fs.statSync(item).isFile();
+        }).forEach(function(file) {
+          console.log(file);
+        });
+
+        // folders in folder
+        items.filter(function(item) {
+          return fs.statSync(item).isDirectory();
+        }).forEach(function(file) {
+          console.log(file);
+        });
+      });
+    });
   })
 }
 convert();
