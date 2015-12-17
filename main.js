@@ -52,7 +52,7 @@ function convertToStega(item, parentFolder) {
     // zip folder and move to tmp
     exec('zip -r "'+path.join('tmp/'+(parentFolder || 'root'), item)+'.zip" "'+path.join('raw_files/'+(parentFolder || ''), item)+'"', shellhelper.bind(this, function() {
       // stegafy the zip file in tmp
-      exec('cat Unknown.png "'+path.join('tmp/'+(parentFolder || 'root'), item)+'.zip" > "'+path.join('upload/'+(parentFolder || 'root'), item+'.zip.png')+'"', shellhelper.bind(this, function() {
+      exec('cat Unknown.png "'+path.join('tmp/'+(parentFolder || 'root'), item)+'.zip" > "'+path.join('upload/'+(parentFolder || 'root'), item+'.png')+'"', shellhelper.bind(this, function() {
         // remove old file in tmp
         exec('rm "'+path.join('tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
           console.log('finished!');
