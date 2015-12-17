@@ -80,18 +80,18 @@ function convert() {
     });
   })
 }
-// convert();
+convert();
 
 // hide individual file/folder at given dir into a stega-file and move to upload, then uploads
 function convertToStega(item, parentFolder) {
-  // create parentFolder in tmp and upload
-  exec('mkdir "'+path.join('tmp/'+(parentFolder || 'root'))+'" ; '+'mkdir "'+path.join('upload/'+(parentFolder || 'root'))+'"', shellhelper.bind(this, function() {
+  // create .tmp/parentFolder and parentFolder in upload
+  exec('mkdir -p "'+path.join('upload/.tmp/'+(parentFolder || 'root'))+'" ; '+'mkdir "'+path.join('upload/'+(parentFolder || 'root'))+'"', shellhelper.bind(this, function() {
     // zip folder and move to tmp
-    exec('zip -r "'+path.join('tmp/'+(parentFolder || 'root'), item)+'.zip" "'+path.join('raw_files/'+(parentFolder || ''), item)+'"', shellhelper.bind(this, function() {
+    exec('zip -r "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item)+'.zip" "'+path.join('raw_files/'+(parentFolder || ''), item)+'"', shellhelper.bind(this, function() {
       // stegafy the zip file in tmp
-      exec('cat Unknown.png "'+path.join('tmp/'+(parentFolder || 'root'), item)+'.zip" > "'+path.join('upload/'+(parentFolder || 'root'), item+'.png')+'"', shellhelper.bind(this, function() {
+      exec('cat Unknown.png "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item)+'.zip" > "'+path.join('upload/'+(parentFolder || 'root'), item+'.png')+'"', shellhelper.bind(this, function() {
         // remove old file in tmp
-        exec('rm "'+path.join('tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
+        exec('rm "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
           console.log('finished!');
           // upload(parentFolder, parentFolder); //keep photoset names the same as their folder name
         }));
