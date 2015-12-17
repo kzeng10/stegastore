@@ -8,83 +8,123 @@ var secret = require('./secret.js');
 var flickrOptions = {
   api_key: secret.api_key,
   secret: secret.secret,
-  permissions: "write",
-  user_id: "me",
+  permissions: 'write',
+  user_id: 'me',
   authenticated: true
 };
 //because flickr is dumb and only gives ids, no names
+//perhaps use postgres?
 var photoset_ids = {}; //name : id
 var photo_ids = {}; //name : id
 
 Flickr.authenticate(flickrOptions, function(error, flickr) {
   _.extend(flickrOptions, flickr.options);
-  download(flickr, 72157662310752692);
-})
+  //update photoset_ids
+  flickr.photosets.getList(flickrOptions, function(error, results) {
+    results.photosets.photoset.forEach(function(meta) {
+      photoset_ids[meta.title._content] =  meta.id;
+    });
+  });
+  // upload(flickr, 'test');
+  // convertToStega('Photos-2 copy', true, 'testing');
+});
 
-//upload everything in upload folder in specified photoset
+// because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
+// files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting
+// hide all files in raw_files (or specific path) into stega-files and move to upload
+function convert() {
+  fs.readdir(path.join(__dirname, 'raw_files'), function(err, items) {
+    console.log(items);
+    //for each item,
+    //if file, convertToStega(fileName, false)
+    //if folder, readdir
+    //  for each item,
+    //    if file, convertToStega(itemName, false, folderName)
+    //    if folder, convertToStega(itemName, true, folderName)
+  })
+}
 
-// function upload(flickr, photoset) {
-//   var uploadOptions = { photos: fs.readdirSync("upload").filter(function (fileName) {return fileName.split(".")[0] !== '';}).map(function (fileName) {
-//     return {
-//       title: fileName.split(".")[0],
-//       tags: [fileName.split(".")[0]],
-//       is_public: 0,
-//       is_friend: 0,
-//       is_family: 0,
-//       photo: path.join(__dirname, "/upload/"+fileName)
-//     }
-//   })};
-//   Flickr.upload(uploadOptions, flickrOptions, function(error, photo_ids) {
-//     if(error) { console.log(error.stack);}
-//     if(photoset) {
-//       //move to specified photoset
-//       photo_ids.forEach(function (photo_id) {
-//         flickr.photosets.addPhoto(_.extend(flickrOptions, {
-//           photoset_id: photoset_ids[photoset],
-//           photo_id: photo_id
-//         }),
-//           function(error) { if(error) console.log(error);}
-//         );
-//       });
-//     } else {
-//       //create photoset with first image, then add rest in
-//       flickr.photosets.create(_.extend(flickrOptions, {title: Date.now(), primary_photo_id: photo_ids[0]}), function(error, result) {
-//         if(error) {console.log(error.stack);}
-//         for(var i = 1; i<photo_ids.length; i++) {
-//           flickr.photosets.addPhoto(_.extend(flickrOptions, {
-//             photoset_id: result.photoset.id,
-//             photo_id: photo_ids[i]
-//           }),
-//             function(error) { if(error) console.log(error.stack());}
-//           );
-//         }
-//       });
-//     }
-//   });
-// }
+// hide individual file/folder (if folder zip first) at given dir into a stega-file and move to upload
+function convertToStega(item, isFolder, parentFolder) {
+  if(isFolder) {
+    // create parentFolder in tmp and upload
+    exec('mkdir "'+path.join('tmp', parentFolder)+'" ; '+'mkdir "'+path.join('upload', parentFolder)+'"', shellhelper.bind(this, function() {
+      // zip folder and move to tmp
+      exec('zip -r "'+path.join('tmp', parentFolder, item)+'" "'+path.join('raw_files', parentFolder, item)+'"', shellhelper.bind(this, function() {
+        // stegafy the zip file in tmp
+        exec('cat Unknown.png "'+path.join('tmp', parentFolder, item+'.zip')+'" > "'+path.join('upload', parentFolder, item+'.zip.png')+'"', shellhelper.bind(this, function() {
+          // remove old file in tmp
+          exec('rm "'+path.join('tmp', parentFolder, item+'.zip')+'"', shellhelper.bind(this, function() {
+            console.log('finished!');
+          }));
+        }));
+      }));
+    }));
+  }
+}
 
-// upload();
+// upload everything in upload (or specified) folder to specified photoset
+function upload(flickr, folderName, photoset) {
+  folderDir = path.join(__dirname, 'upload/'+(folderName || ''));
+  var uploadOptions = { photos: fs.readdirSync(folderDir).filter(function (fileName) {return fileName.split('.')[0] !== '';}).map(function (fileName) {
+    return {
+      title: fileName.split('.')[0],
+      tags: [fileName.split('.')[0]],
+      is_public: 0,
+      is_friend: 0,
+      is_family: 0,
+      photo: path.join(folderDir, fileName)
+    }
+  })};
+  console.log(uploadOptions);
+  Flickr.upload(uploadOptions, flickrOptions, function(error, photo_ids) {
+    console.log('finished uploading', photo_ids, ', now moving to photoset', folderName || 'root');
+    if(error) { console.log(error.stack);}
+    if(photoset && photoset_ids[photoset]) {
+      //move to specified photoset
+      photo_ids.forEach(function (photo_id) {
+        flickr.photosets.addPhoto(_.extend(flickrOptions, {
+          photoset_id: photoset_ids[photoset],
+          photo_id: photo_id
+        }),
+          function(error) { if(error) console.log(error);}
+        );
+      });
+    } else {
+      //create photoset with first image, then add rest in
+      flickr.photosets.create(_.extend(flickrOptions, {title: folderName || 'root', primary_photo_id: photo_ids[0]}), function(error, result) {
+        if(error) {console.log(error.stack);}
+        for(var i = 1; i<photo_ids.length; i++) {
+          flickr.photosets.addPhoto(_.extend(flickrOptions, {
+            photoset_id: result.photoset.id,
+            photo_id: photo_ids[i]
+          }),
+            function(error) { if(error) console.log(error.stack());}
+          );
+        }
+      });
+    }
+  });
+}
 
 // downloads all photos of user in specified photoset, then unzips all of them into downloads folder
-// todo:
-// - download from specific photoset/album? use albums as files or folders?
 function download(flickr, photoset) {
   if(photoset && photoset_ids[photoset]) {
-    flickr.photosets.getPhotos(_.extend(flickrOptions, {extras: "url_o", photoset_id: photoset_ids[photoset]}), function(error, result) {
+    flickr.photosets.getPhotos(_.extend(flickrOptions, {extras: 'url_o', photoset_id: photoset_ids[photoset]}), function(error, result) {
       if(error) console.log(error.stack);
-      helper(result);
+      dlhelper(result);
     });
   } else {
-    flickr.people.getPhotos(_.extend(flickrOptions, {extras: "url_o"}), function(error, result) {
+    flickr.people.getPhotos(_.extend(flickrOptions, {extras: 'url_o'}), function(error, result) {
       if(error) console.log(error.stack);
-      helper(result);
+      dlhelper(result);
     });
   }
 }
 
-function helper(result) {
+function dlhelper(result) {
   result.photos.photo.forEach(function(photoMeta) {
-    var file = fs.createWriteStream(photoMeta.title + ".tmp");
+    var file = fs.createWriteStream(photoMeta.title + '.tmp');
     request
     .get(photoMeta.url_o)
     .on('error', function(err) {
@@ -107,6 +147,16 @@ function helper(result) {
       }
     });
   });
+}
+
+// DRY
+function shellhelper(callback, error, stdout, stderr) {
+  console.log('stdout: ' + stdout);
+  console.log('stderr: ' + stderr);
+  if (error !== null) {
+    console.log('exec error: ' + error);
+  }
+  callback();
 }
 
 // downloads what you don't have locally, use this to sync?
