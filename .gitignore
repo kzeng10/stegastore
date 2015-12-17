@@ -1,5 +1,7 @@
 data
 node_modules
+secret.js
 upload
 download
-secret.js
+raw_files
+tmp
