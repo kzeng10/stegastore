@@ -17,17 +17,17 @@ var flickrOptions = {
 var photoset_ids = {}; //name : id
 var photo_ids = {}; //name : id
 
-Flickr.authenticate(flickrOptions, function(error, flickr) {
-  _.extend(flickrOptions, flickr.options);
-  //update photoset_ids
-  flickr.photosets.getList(flickrOptions, function(error, results) {
-    results.photosets.photoset.forEach(function(meta) {
-      photoset_ids[meta.title._content] =  meta.id;
-    });
-  });
-  // upload(flickr, 'test');
-  // convertToStega('Photos-2 copy', true, 'testing');
-});
+// Flickr.authenticate(flickrOptions, function(error, flickr) {
+//   _.extend(flickrOptions, flickr.options);
+//   //update photoset_ids
+//   flickr.photosets.getList(flickrOptions, function(error, results) {
+//     results.photosets.photoset.forEach(function(meta) {
+//       photoset_ids[meta.title._content] =  meta.id;
+//     });
+//   });
+//   // upload(flickr, 'test');
+
+// });
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
 // files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting
@@ -36,6 +36,7 @@ function convert() {
   fs.readdir(path.join(__dirname, 'raw_files'), function(err, items) {
     console.log(items);
     //for each item,
+    //if fileName.split('.')[0] === '', continue (ignore hidden files)
     //if file, convertToStega(fileName, false)
     //if folder, readdir
     //  for each item,
@@ -44,24 +45,24 @@ function convert() {
   })
 }
 
-// hide individual file/folder (if folder zip first) at given dir into a stega-file and move to upload
-function convertToStega(item, isFolder, parentFolder) {
-  if(isFolder) {
-    // create parentFolder in tmp and upload
-    exec('mkdir "'+path.join('tmp', parentFolder)+'" ; '+'mkdir "'+path.join('upload', parentFolder)+'"', shellhelper.bind(this, function() {
-      // zip folder and move to tmp
-      exec('zip -r "'+path.join('tmp', parentFolder, item)+'" "'+path.join('raw_files', parentFolder, item)+'"', shellhelper.bind(this, function() {
-        // stegafy the zip file in tmp
-        exec('cat Unknown.png "'+path.join('tmp', parentFolder, item+'.zip')+'" > "'+path.join('upload', parentFolder, item+'.zip.png')+'"', shellhelper.bind(this, function() {
-          // remove old file in tmp
-          exec('rm "'+path.join('tmp', parentFolder, item+'.zip')+'"', shellhelper.bind(this, function() {
-            console.log('finished!');
-          }));
+// hide individual file/folder at given dir into a stega-file and move to upload
+function convertToStega(item, parentFolder) {
+  // create parentFolder in tmp and upload
+  exec('mkdir "'+path.join('tmp', parentFolder)+'" ; '+'mkdir "'+path.join('upload', parentFolder)+'"', shellhelper.bind(this, function() {
+    // zip folder and move to tmp
+    exec('zip -r "'+path.join('tmp', parentFolder, item)+'.zip" "'+path.join('raw_files', parentFolder, item)+'"', shellhelper.bind(this, function() {
+      // stegafy the zip file in tmp
+      exec('cat Unknown.png "'+path.join('tmp', parentFolder, item+'.zip')+'" > "'+path.join('upload', parentFolder, item+'.zip.png')+'"', shellhelper.bind(this, function() {
+        // remove old file in tmp
+        exec('rm "'+path.join('tmp', parentFolder, item+'.zip')+'"', shellhelper.bind(this, function() {
+          console.log('finished!');
         }));
       }));
     }));
-  }
+  }));
 }
+convertToStega('0926151802.jpg', 'Photos-2');
+convertToStega('Photos-2 copy', 'testing');
 
 // upload everything in upload (or specified) folder to specified photoset
 function upload(flickr, folderName, photoset) {
