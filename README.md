@@ -1,6 +1,5 @@
 # StegaStore
 Use Flickr's free 1-terabyte storage for storing files of any kind!
-Note that Flickr's restrictions only allow for files under 200mb.
 
 # Install
 ```
