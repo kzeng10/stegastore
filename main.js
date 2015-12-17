@@ -101,9 +101,9 @@ function convertToStega(item, parentFolder) {
 }
 
 
-// upload everything in upload (or specified) folder to specified photoset
-function upload(flickr, folderName, photoset) {
-  folderDir = path.join(__dirname, 'upload/'+(folderName || 'root'));
+// upload everything in specified folder to specified photoset (of the same name)
+function upload(flickr, folderName) {
+  folderDir = path.join(__dirname, 'upload', folderName);
   var uploadOptions = { photos: fs.readdirSync(folderDir).filter(function (fileName) {return fileName.split('.')[0] !== '';}).map(function (fileName) {
     return {
       title: fileName.split('.')[0],
@@ -118,11 +118,11 @@ function upload(flickr, folderName, photoset) {
   Flickr.upload(uploadOptions, flickrOptions, function(error, photo_ids) {
     console.log('finished uploading', photo_ids, ', now moving to photoset', folderName || 'root');
     if(error) { console.log(error.stack);}
-    if(photoset && photoset_ids[photoset]) {
+    if(folderName && photoset_ids[folderName]) {
       //move to specified photoset
       photo_ids.forEach(function (photo_id) {
         flickr.photosets.addPhoto(_.extend(flickrOptions, {
-          photoset_id: photoset_ids[photoset],
+          photoset_id: photoset_ids[folderName],
           photo_id: photo_id
         }),
           function(error) { if(error) console.log(error);}
@@ -130,7 +130,7 @@ function upload(flickr, folderName, photoset) {
       });
     } else {
       //create photoset with first image, then add rest in
-      flickr.photosets.create(_.extend(flickrOptions, {title: folderName || 'root', primary_photo_id: photo_ids[0]}), function(error, result) {
+      flickr.photosets.create(_.extend(flickrOptions, {title: folderName, primary_photo_id: photo_ids[0]}), function(error, result) {
         if(error) {console.log(error.stack);}
         for(var i = 1; i<photo_ids.length; i++) {
           flickr.photosets.addPhoto(_.extend(flickrOptions, {
