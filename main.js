@@ -37,24 +37,24 @@ function convert() {
     console.log(items);
     //for each item,
     //if fileName.split('.')[0] === '', continue (ignore hidden files)
-    //if file, convertToStega(fileName, false)
+    //if file, convertToStega(fileName)
     //if folder, readdir
     //  for each item,
-    //    if file, convertToStega(itemName, false, folderName)
-    //    if folder, convertToStega(itemName, true, folderName)
+    //    if file, convertToStega(itemName, folderName)
+    //    if folder, convertToStega(itemName, folderName)
   })
 }
 
 // hide individual file/folder at given dir into a stega-file and move to upload
 function convertToStega(item, parentFolder) {
   // create parentFolder in tmp and upload
-  exec('mkdir "'+path.join('tmp', parentFolder)+'" ; '+'mkdir "'+path.join('upload', parentFolder)+'"', shellhelper.bind(this, function() {
+  exec('mkdir "'+path.join('tmp/'+(parentFolder || 'root'))+'" ; '+'mkdir "'+path.join('upload/'+(parentFolder || 'root'))+'"', shellhelper.bind(this, function() {
     // zip folder and move to tmp
-    exec('zip -r "'+path.join('tmp', parentFolder, item)+'.zip" "'+path.join('raw_files', parentFolder, item)+'"', shellhelper.bind(this, function() {
+    exec('zip -r "'+path.join('tmp/'+(parentFolder || 'root'), item)+'.zip" "'+path.join('raw_files/'+(parentFolder || ''), item)+'"', shellhelper.bind(this, function() {
       // stegafy the zip file in tmp
-      exec('cat Unknown.png "'+path.join('tmp', parentFolder, item+'.zip')+'" > "'+path.join('upload', parentFolder, item+'.zip.png')+'"', shellhelper.bind(this, function() {
+      exec('cat Unknown.png "'+path.join('tmp/'+(parentFolder || 'root'), item)+'.zip" > "'+path.join('upload/'+(parentFolder || 'root'), item+'.zip.png')+'"', shellhelper.bind(this, function() {
         // remove old file in tmp
-        exec('rm "'+path.join('tmp', parentFolder, item+'.zip')+'"', shellhelper.bind(this, function() {
+        exec('rm "'+path.join('tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
           console.log('finished!');
         }));
       }));
@@ -63,6 +63,7 @@ function convertToStega(item, parentFolder) {
 }
 convertToStega('0926151802.jpg', 'Photos-2');
 convertToStega('Photos-2 copy', 'testing');
+convertToStega('test.pdf');
 
 // upload everything in upload (or specified) folder to specified photoset
 function upload(flickr, folderName, photoset) {
