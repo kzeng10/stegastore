@@ -1,5 +1,5 @@
-var Flickr = require("flickrapi");
-var _ = require("underscore");
+var Flickr = require('flickrapi');
+var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
 var request = require('request');
@@ -134,16 +134,11 @@ function dlhelper(result) {
     .on('finish', function(err) {
       if(err) console.log(err);
       else {
-        exec("unzip -u "+photoMeta.title+".tmp -d download", function(error, stdout, stderr) {
-          console.log('stdout: ' + stdout);
-          console.log('stderr: ' + stderr);
-          if (error !== null) {
-            console.log('exec error: ' + error);
-          }
-          exec("rm "+photoMeta.title+".tmp", function(error, stdout, stderr) {
-            console.log("removed file "+photoMeta.title);
-          });
-        });
+        exec('unzip -u '+photoMeta.title+'.tmp -d download', shellhelper(error, stdout, stderr, function() {
+          exec('rm '+photoMeta.title+'.tmp', shellhelper(error, stdout, stderr, function() {
+            console.log('removed file '+photoMeta.title);
+          }));
+        }));
       }
     });
   });
