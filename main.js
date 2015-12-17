@@ -15,23 +15,29 @@ var flickrOptions = {
 //because flickr is dumb and only gives ids, no names
 //perhaps use postgres?
 var photoset_ids = {}; //name : id
-var photo_ids = {}; //name : id
+var photo_ids = {}; //photoset: {photoname : id}
 
-// Flickr.authenticate(flickrOptions, function(error, flickr) {
-//   _.extend(flickrOptions, flickr.options);
-//   upload = upload.bind(this, flickr);
-//   download = download.bind(this, flickr);
-//   //update photoset_ids
-//   flickr.photosets.getList(flickrOptions, function(error, results) {
-//     results.photosets.photoset.forEach(function(meta) {
-//       photoset_ids[meta.title._content] =  meta.id;
-//     });
-//     // convertToStega('0926151802.jpg', 'Photos-3');
-//     // convertToStega('Photos-2 copy', 'testing1');
-//     // convertToStega('test1.pdf');
-//   });
-//   // upload('test');
-// });
+Flickr.authenticate(flickrOptions, function(error, flickr) {
+  _.extend(flickrOptions, flickr.options);
+  upload = upload.bind(this, flickr);
+  download = download.bind(this, flickr);
+  //update photoset_ids
+  flickr.photosets.getList(flickrOptions, function(error, results) {
+    results.photosets.photoset.forEach(function(meta) {
+      photoset_ids[meta.title._content] =  meta.id;
+      photo_ids[meta.title._content] = {};
+      flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
+        results.photoset.photo.forEach(function(photo) {
+          photo_ids[meta.title._content][photo.title] = photo.id;
+        });
+      })
+    });
+    // convertToStega('0926151802.jpg', 'Photos-3');
+    // convertToStega('Photos-2 copy', 'testing1');
+    // convertToStega('test1.pdf');
+  });
+  // upload('testing1');
+});
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
 // files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting
@@ -80,7 +86,7 @@ function convert() {
     });
   })
 }
-convert();
+// convert();
 
 // hide individual file/folder at given dir into a stega-file and move to upload, then uploads
 function convertToStega(item, parentFolder) {
