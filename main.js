@@ -17,6 +17,20 @@ var flickrOptions = {
 var photoset_ids = {}; //name : id
 var photo_ids = {}; //photoset: {photoname : id}
 
+"""
+Basic documentation
+_________
+
+convertToStega(file) -> turns ./raw_files/$(file) into a stega-file, moves to ./upload/root/$(file)
+convertToStega(item, parentFolder) -> turns ./raw_files/$(parentFolder)/$(item) into a stega-file, moves to ./upload/$(parentFolder)/$(file)
+convert() -> applies convertToStega to everything in ./raw_files
+upload(folderName) -> uploads everything in ./upload/$(folderName) to Flickr
+upload(folderName, file) -> uploads ./upload/$(folderName)/$(file) to Flickr
+download(photoset_id) -> downloads photoset from Flickr
+download(photoset_id, photo_id) -> downloads photo inside photoset from Flickr
+"""
+
+
 Flickr.authenticate(flickrOptions, function(error, flickr) {
   _.extend(flickrOptions, flickr.options);
   upload = upload.bind(this, flickr);
