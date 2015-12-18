@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>File upload Node.</title>
+  </head>
+  <body>
+      <form id="uploadForm"
+         enctype="multipart/form-data"
+         action="/api/upload"
+         method="post">
+      <input type="file" name="file" />
+      <input type="button" value="Upload Image" name="submit" onclick="formSubmit(this)">
+      <span id = "status"></span>
+    </form>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+  <script>
+  function formSubmit(input) {
+    $('#'+input.form.id).ajaxSubmit({
+        error: function(xhr) {
+          status('Error: ' + xhr.status);
+        },
+        success: function(response) {
+          $("#status").empty().text("UPLOADED");
+          console.log("UPLOADED!");
+        }
+      });
+    }
+  $(document).ready(function() {
+
+    $('#uploadForm').on('submit', function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      $("#status").empty().text("File is uploading...");
+      $(this).ajaxSubmit({
+        error: function(xhr) {
+          status('Error: ' + xhr.status);
+        },
+        success: function(response) {
+          $("#status").empty().text(response);
+          console.log("UPLOADED!");
+        }
+      });
+      return false;
+    });
+});
+</script>
+</html>

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js"
   },
   "author": "Kevin Zeng <kzeng10@gmail.com>",
   "dependencies": {
@@ -15,9 +15,12 @@
     "morgan": "~1.5.1",
     "serve-favicon": "~2.2.0",
     "flickrapi": "latest",
-    "nodemon": "latest",
     "underscore": "latest",
     "request": "latest",
-    "unzip2": "latest"
+    "unzip2": "latest",
+    "multer": "latest"
+  },
+  "devDependencies": {
+    "nodemon": "latest"
   }
 }

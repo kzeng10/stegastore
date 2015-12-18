@@ -1,60 +1,41 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var express  =   require('express');
+var multer   =   require('multer');
+var path     =   require('path');
+var fs       =   require('fs');
+var app      =   express();
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, './raw_files');
+  },
+  filename: function(req, file, cb) {
+    cb(null, file.originalname)
+  }
+});
+var upload   =   multer({storage: storage});
 
-var app = express();
+app.use(upload.any());
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// app.use('/api/upload', upload.single('file'));
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+//res.download(file) to download file to user!
 
-app.use('/', routes);
-app.use('/users', users);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+app.get('/',function(req,res){
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+app.post('/api/upload', function(req,res){
+  console.log(req.files);
+  // fs.readFile(req.files.displayImage.path, function (err, data) {
+  //   var newPath = path.join(__dirname, 'raw_files');
+  //   fs.writeFile(newPath, data, function (err) {
+  //     res.redirect("back");
+  //   });
+  // });
+  res.send();
 });
 
-
-module.exports = app;
+app.listen(3000,function(){
+  console.log('Working on port 3000');
+});
