@@ -37,7 +37,8 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
     // convertToStega('Photos-2 copy', 'testing1');
     // convertToStega('test1.pdf');
   });
-  // setTimeout(deleteEverything, 1000);
+  // upload('root');
+  // setTimeout(deleteEverything, 5000);
   // upload('testing1');
   // upload('root', 'test1.pdf.png');
   // download('72157660179585674');
@@ -113,7 +114,7 @@ function convertToStega(item, parentFolder) {
 
 // upload everything (or specified file) in specified folder to specified photoset (of the same name)
 function upload(flickr, folderName, file) {
-  folderDir = path.join(__dirname, 'upload', folderName);
+  var folderDir = path.join(__dirname, 'upload', folderName);
   var uploadOptions = {
     photos: fs.readdirSync(folderDir).filter(function (fileName) {return fileName.split('.')[0] !== '' && (file ? fileName === file : true);}).map(function (fileName) {
     return {
@@ -127,7 +128,7 @@ function upload(flickr, folderName, file) {
   })};
   console.log(uploadOptions);
   Flickr.upload(uploadOptions, flickrOptions, function(error, photo_ids) {
-    console.log('finished uploading', photo_ids, ', now moving to photoset', folderName || 'root');
+    console.log('finished uploading', photo_ids, ', now moving to photoset', folderName);
     if(error) { console.log(error.stack);}
     if(folderName && photoset_ids[folderName]) {
       //move to specified photoset
