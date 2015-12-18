@@ -36,8 +36,10 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
     // convertToStega('Photos-2 copy', 'testing1');
     // convertToStega('test1.pdf');
   });
-  upload('testing1');
-  upload('root', 'test1.pdf.png');
+  // upload('testing1');
+  // upload('root', 'test1.pdf.png');
+  // download('72157662528655195');
+  // download('72157662528655195', '23448717979');
 });
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
@@ -152,39 +154,32 @@ function upload(flickr, folderName, file) {
   });
 }
 
-// downloads all photos of user in specified photoset, then unzips all of them into downloads folder
-function download(flickr, photoset) {
-  if(photoset && photoset_ids[photoset]) {
-    flickr.photosets.getPhotos(_.extend(flickrOptions, {extras: 'url_o', photoset_id: photoset_ids[photoset]}), function(error, result) {
-      if(error) console.log(error.stack);
-      dlhelper(result);
-    });
-  } else {
-    flickr.people.getPhotos(_.extend(flickrOptions, {extras: 'url_o'}), function(error, result) {
-      if(error) console.log(error.stack);
-      dlhelper(result);
-    });
-  }
-}
-
-function dlhelper(result) {
-  result.photos.photo.forEach(function(photoMeta) {
-    var file = fs.createWriteStream(photoMeta.title + '.tmp');
-    request
-    .get(photoMeta.url_o)
-    .on('error', function(err) {
-      console.log(err);
-    })
-    .pipe(file)
-    .on('finish', function(err) {
-      if(err) console.log(err);
-      else {
-        exec('unzip -u '+photoMeta.title+'.tmp -d download', shellhelper(error, stdout, stderr, function() {
-          exec('rm '+photoMeta.title+'.tmp', shellhelper(error, stdout, stderr, function() {
-            console.log('removed file '+photoMeta.title);
+// downloads all photos (or specified photo) of user in specified photoset, then unzips all of them into downloads folder
+function download(flickr, photoset_id, photo_id) {
+  flickr.photosets.getPhotos(_.extend(flickrOptions, {extras: 'url_o', photoset_id: photoset_id}), function(error, result) {
+    if(error) console.log(error.stack);
+    console.log(result);
+    result.photoset.photo
+    .filter(function(photoMeta) {return (photo_id ? photoMeta.id === photo_id : true);})
+    .forEach(function(photoMeta) {
+      console.log(photoMeta);
+      var file = fs.createWriteStream(photoMeta.title + '.tmp');
+      request
+      .get(photoMeta.url_o)
+      .on('error', function(err) {
+        console.log(err);
+      })
+      .pipe(file)
+      .on('finish', function(err) {
+        if(err) console.log(err);
+        else {
+          exec('unzip -u "'+photoMeta.title+'.tmp" -d download', shellhelper.bind(this, function() {
+            exec('rm "'+photoMeta.title+'.tmp"', shellhelper.bind(this, function() {
+              console.log('removed file '+photoMeta.title);
+            }));
           }));
-        }));
-      }
+        }
+      });
     });
   });
 }
