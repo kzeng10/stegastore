@@ -11,14 +11,17 @@ Work in progress. Main functions in `main.js`, to be built into a full-fledged a
 # To-do
 - [x] upload workflow (everything in raw_files -> upload)
 - [x] download either individual file or photoset, sort out logic for that
+- es6/babel
 - [ ] web app
   - [x] basic server
-  - [ ] basic UI/front-end
+  - [ ] basic UI/front-end (react)
+    - [ ]drag and drop for upload
   - interactivity
     - [ ] display file hierarchy uploaded to flickr
+        - click to download/navigate
     - [x] allow user to upload async. (AJAX)
         - workflow: click upload button -> user selects file/folder -> move to raw_files folder -> upload() -> clear raw_files and upload folders
-        - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...) (https://github.com/23/resumable.js may work)
+        - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
         - [ ] replace existings files (waiting for flickrapi to add that in...)
     - [ ] allow user to download
         - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear raw_files and download folders
