@@ -6,7 +6,8 @@ var app      =   express();
 
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, './raw_files');
+    console.log(req.files, file);
+    cb(null, path.join('./raw_files', file, req));
   },
   filename: function(req, file, cb) {
     cb(null, file.originalname)

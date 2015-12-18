@@ -7,23 +7,34 @@
          enctype="multipart/form-data"
          action="/api/upload"
          method="post">
-      <input type="file" name="file" multiple/>
+      <input type="file" name="fileUpload" id="fileUpload" multiple directory webkitdirectory mozdirectory/>
       <input type="button" value="Upload Image" name="submit" onclick="formSubmit(this)">
-      <span id = "status"></span>
     </form>
+    <span id="status"></span>
+    <ul id="fileList"></ul>
   </body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
   <script>
   function formSubmit(input) {
     $('#'+input.form.id).ajaxSubmit({
-        error: function(xhr) {
-          status('Error: ' + xhr.status);
-        },
-        success: function(response) {
-          $("#status").empty().text("Finished uploading "+response);
-        }
-      });
-    }
+      error: function(xhr) {
+        status('Error: ' + xhr.status);
+      },
+      success: function(response) {
+        $("#status").empty().text("Finished uploading "+response);
+      }
+    });
+  }
+
+  $('#fileUpload').on('change', function(event) {
+
+    $('#fileList').empty().append($.map($('#fileUpload').prop('files'), function(file) {
+      return '<li>' + (file.webkitRelativePath || '') + file.name + '</li>';
+    }).join(''));
+    // var msg = event.target.files.map(function(file) {return file.name;}).join(" ,");
+    // console.log(msg);
+
+  });
 </script>
 </html>
