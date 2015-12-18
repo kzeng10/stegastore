@@ -8,13 +8,22 @@ require('babel-polyfill');
 
 class DropzoneArea extends Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      files: []
+    };
+  }
+
   onDrop(files, callback){
     var req = request.post('/api/upload');
+    // var {files} = this.state;
     files.forEach( (file) => {
       console.log(file);
       req.attach(file.name, file, file.name);
     });
     req.end();
+    this.setState({files: files.map((file) => {return file.name;})});
   }
 
   render() {
@@ -23,6 +32,24 @@ class DropzoneArea extends Component {
         <Dropzone onDrop={this.onDrop.bind(this)}>
           <div>Try dropping some files here, or click to select files to upload.</div>
         </Dropzone>
+        <FileList files={this.state.files} />
+      </div>
+    );
+  }
+}
+
+class FileList extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <div>
+        <h2>Uploaded files:</h2>
+        <ul>
+          {this.props.files.map((file) => {return <li id={file}>{file}</li>;})}
+        </ul>
       </div>
     );
   }
