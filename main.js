@@ -39,7 +39,7 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
   // upload('testing1');
   // upload('root', 'test1.pdf.png');
   // download('72157662528655195');
-  // download('72157662528655195', '23448717979');
+  download('72157662528655195', '23448717979');
 });
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
@@ -159,28 +159,30 @@ function download(flickr, photoset_id, photo_id) {
   flickr.photosets.getPhotos(_.extend(flickrOptions, {extras: 'url_o', photoset_id: photoset_id}), function(error, result) {
     if(error) console.log(error.stack);
     console.log(result);
-    result.photoset.photo
-    .filter(function(photoMeta) {return (photo_id ? photoMeta.id === photo_id : true);})
-    .forEach(function(photoMeta) {
-      console.log(photoMeta);
-      var file = fs.createWriteStream(photoMeta.title + '.tmp');
-      request
-      .get(photoMeta.url_o)
-      .on('error', function(err) {
-        console.log(err);
-      })
-      .pipe(file)
-      .on('finish', function(err) {
-        if(err) console.log(err);
-        else {
-          exec('unzip -u "'+photoMeta.title+'.tmp" -d download', shellhelper.bind(this, function() {
-            exec('rm "'+photoMeta.title+'.tmp"', shellhelper.bind(this, function() {
-              console.log('removed file '+photoMeta.title);
+    exec('mkdir -p download/.tmp', shellhelper.bind(this, function() {
+      result.photoset.photo
+      .filter(function(photoMeta) {return (photo_id ? photoMeta.id === photo_id : true);})
+      .forEach(function(photoMeta) {
+        console.log(photoMeta);
+        var file = fs.createWriteStream(path.join('download', '.tmp', photoMeta.title));
+        request
+        .get(photoMeta.url_o)
+        .on('error', function(err) {
+          console.log(err);
+        })
+        .pipe(file)
+        .on('finish', function(err) {
+          if(err) console.log(err);
+          else {
+            exec('unzip -u "'+path.join('download','.tmp',photoMeta.title)+'" -d download', shellhelper.bind(this, function() {
+              exec('rm "'+path.join('download','.tmp',photoMeta.title)+'"', shellhelper.bind(this, function() {
+                console.log('removed file '+photoMeta.title);
+              }));
             }));
-          }));
-        }
+          }
+        });
       });
-    });
+    }));
   });
 }
 
