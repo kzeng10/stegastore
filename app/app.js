@@ -5,6 +5,6 @@ import {default as update} from "react-addons-update";
 require("babel-polyfill");
 
 ReactDOM.render(
-  <h1>Hello, world!</h1>,
+  <h1>Hello, world!!!</h1>,
   document.getElementById('example')
 );
