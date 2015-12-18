@@ -12,12 +12,13 @@ Work in progress. Main functions in `main.js`, to be built into a full-fledged a
 - [x] upload workflow (everything in raw_files -> upload)
 - [x] download either individual file or photoset, sort out logic for that
 - [ ] web app
-  - [ ] basic server
+  - [x] basic server
   - [ ] basic UI/front-end
   - interactivity
     - [ ] display file hierarchy uploaded to flickr
-    - [ ] allow user to upload async. (AJAX)
+    - [x] allow user to upload async. (AJAX)
         - workflow: click upload button -> user selects file/folder -> move to raw_files folder -> upload() -> clear raw_files and upload folders
+        - [ ] maintain folder hierarchy when uploading folders to raw_files
         - replace existings files (waiting for flickrapi to add that in...)
     - [ ] allow user to download
         - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear raw_files and download folders
