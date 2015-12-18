@@ -15,11 +15,12 @@ var storage = multer.diskStorage({
 var upload   =   multer({storage});
 
 app.use('/api/upload', upload.any());
+app.use(express.static('dist'));
 
 //res.download(file) to download file to user!
 
 app.get('/',function(req,res){
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.post('/api/upload', function(req,res){

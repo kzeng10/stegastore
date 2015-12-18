@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React!</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+  </body>
+  <!-- magically toggle between scripts for local server / build -->
+  <script type="text/javascript">
+    var url = document.URL.indexOf("localhost") > -1 ? "http://localhost:8080/app.js" : "dist/app.js";
+    document.write('<' + 'script src="' + url + '" ></script' + '>');
+  </script>
+</html>
