@@ -1,12 +1,13 @@
 # StegaStore
 Use Flickr's free 1-terabyte storage for storing files of any kind!
 
-# Install
+# Install & Use
 ```
 $ git clone git@github.com:kzeng10/stegastore.git
 $ npm install
+$ npm start
 ```
-Work in progress. Main functions in `main.js`, to be built into a full-fledged app (web?)
+Work in progress. Main functions in `main.js`.
 
 # To-do
 - [x] upload workflow (everything in raw_files -> upload)
