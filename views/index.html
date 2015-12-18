@@ -7,7 +7,7 @@
          enctype="multipart/form-data"
          action="/api/upload"
          method="post">
-      <input type="file" name="file" />
+      <input type="file" name="file" multiple/>
       <input type="button" value="Upload Image" name="submit" onclick="formSubmit(this)">
       <span id = "status"></span>
     </form>
@@ -21,28 +21,9 @@
           status('Error: ' + xhr.status);
         },
         success: function(response) {
-          $("#status").empty().text("UPLOADED");
-          console.log("UPLOADED!");
+          $("#status").empty().text("Finished uploading "+response);
         }
       });
     }
-  $(document).ready(function() {
-
-    $('#uploadForm').on('submit', function(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      $("#status").empty().text("File is uploading...");
-      $(this).ajaxSubmit({
-        error: function(xhr) {
-          status('Error: ' + xhr.status);
-        },
-        success: function(response) {
-          $("#status").empty().text(response);
-          console.log("UPLOADED!");
-        }
-      });
-      return false;
-    });
-});
 </script>
 </html>

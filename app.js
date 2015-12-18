@@ -33,7 +33,7 @@ app.post('/api/upload', function(req,res){
   //     res.redirect("back");
   //   });
   // });
-  res.send();
+  res.send(req.files.map(function(file) {return file.filename;}).join(', '));
 });
 
 app.listen(3000,function(){
