@@ -10,7 +10,7 @@ Work in progress. Main functions in `main.js`, to be built into a full-fledged a
 
 # To-do
 - [x] upload workflow (everything in raw_files -> upload)
-- [ ] download either individual file or photoset, sort out logic for that
+- [x] download either individual file or photoset, sort out logic for that
 - [ ] web app
   - [ ] basic server
   - [ ] local database (file hierarchy, photoset mappings)
