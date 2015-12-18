@@ -13,7 +13,6 @@ Work in progress. Main functions in `main.js`, to be built into a full-fledged a
 - [x] download either individual file or photoset, sort out logic for that
 - [ ] web app
   - [ ] basic server
-  - [ ] local database (file hierarchy, photoset mappings)
   - [ ] basic UI/front-end
   - interactivity
     - [ ] display file hierarchy uploaded to flickr
