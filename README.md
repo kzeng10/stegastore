@@ -14,19 +14,22 @@ Work in progress. Main functions in `main.js`, to be built into a full-fledged a
 - [ ] web app
   - [x] basic server
   - [ ] basic UI/front-end (react)
-    - [ ]drag and drop for upload
+    - [x] drag and drop for upload
   - interactivity
     - [ ] display file hierarchy uploaded to flickr
         - click to download/navigate
     - [x] allow user to upload async. (AJAX)
         - workflow: click upload button -> user selects file/folder -> move to raw_files folder -> upload() -> clear raw_files and upload folders
-        - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
         - [ ] replace existings files (waiting for flickrapi to add that in...)
     - [ ] allow user to download
         - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear raw_files and download folders
     - [ ] allow user to upsync (native client only?)
     - [ ] allow user to downsync (native clinet only?)
-- [ ] es6/babel
+- [x] es6/babel
+- distant future:
+    - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
+        - react doesn't (currently) support webkitdirectory as a DOM property
+
 
 # Disclaimer
 I am not responsible for anything that happens to your Flickr account when you use StegaStore.

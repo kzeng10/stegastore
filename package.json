@@ -3,26 +3,28 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "webpack; node server.js",
-    "webpack" : "webpack-dev-server --hot --inline"
+    "start": "webpack; nodemon server.js",
+    "webpack": "webpack-dev-server --hot --inline"
   },
   "author": "Kevin Zeng <kzeng10@gmail.com>",
   "dependencies": {
+    "babel-polyfill": "^6.0.16",
     "body-parser": "~1.10.2",
     "cookie-parser": "~1.3.3",
     "debug": "~2.1.1",
     "express": "~4.11.1",
+    "flickrapi": "~0.3.36",
     "jade": "~1.9.1",
     "morgan": "~1.5.1",
-    "serve-favicon": "~2.2.0",
-    "flickrapi": "~0.3.36",
-    "underscore": "~1.8.3",
-    "request": "~2.67.0",
     "multer": "~1.1.0",
-    "babel-polyfill": "^6.0.16",
     "react": "^0.14.2",
     "react-addons-update": "^0.14.1",
-    "react-dom": "^0.14.2"
+    "react-dom": "^0.14.2",
+    "react-dropzone": "^3.3.0",
+    "request": "~2.67.0",
+    "serve-favicon": "~2.2.0",
+    "superagent": "^1.6.1",
+    "underscore": "~1.8.3"
   },
   "devDependencies": {
     "nodemon": "~1.8.1",

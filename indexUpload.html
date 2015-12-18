@@ -17,6 +17,7 @@
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
   <script>
   function formSubmit(input) {
+    console.log($('#'+input.form.id));
     $('#'+input.form.id).ajaxSubmit({
       error: function(xhr) {
         console.log('Error: ' + xhr.status);
