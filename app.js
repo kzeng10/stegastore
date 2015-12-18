@@ -6,8 +6,7 @@ var app      =   express();
 
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    console.log(req.files, file);
-    cb(null, path.join('./raw_files', file, req));
+    cb(null, path.join('./raw_files'));
   },
   filename: function(req, file, cb) {
     cb(null, file.originalname)
@@ -15,12 +14,9 @@ var storage = multer.diskStorage({
 });
 var upload   =   multer({storage: storage});
 
-app.use(upload.any());
-
-// app.use('/api/upload', upload.single('file'));
+app.use('/api/upload', upload.any());
 
 //res.download(file) to download file to user!
-
 
 app.get('/',function(req,res){
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
@@ -28,12 +24,6 @@ app.get('/',function(req,res){
 
 app.post('/api/upload', function(req,res){
   console.log(req.files);
-  // fs.readFile(req.files.displayImage.path, function (err, data) {
-  //   var newPath = path.join(__dirname, 'raw_files');
-  //   fs.writeFile(newPath, data, function (err) {
-  //     res.redirect("back");
-  //   });
-  // });
   res.send(req.files.map(function(file) {return file.filename;}).join(', '));
 });
 

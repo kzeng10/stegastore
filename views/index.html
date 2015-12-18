@@ -7,7 +7,7 @@
          enctype="multipart/form-data"
          action="/api/upload"
          method="post">
-      <input type="file" name="fileUpload" id="fileUpload" multiple directory webkitdirectory mozdirectory/>
+      <input type="file" name="fileUpload" id="fileUpload" multiple/>
       <input type="button" value="Upload Image" name="submit" onclick="formSubmit(this)">
     </form>
     <span id="status"></span>
@@ -19,18 +19,31 @@
   function formSubmit(input) {
     $('#'+input.form.id).ajaxSubmit({
       error: function(xhr) {
-        status('Error: ' + xhr.status);
+        console.log('Error: ' + xhr.status);
       },
       success: function(response) {
         $("#status").empty().text("Finished uploading "+response);
       }
+      // data: (function() {
+      //   var mapping = {};
+      //   $.each($('#fileUpload').prop('files'), function(file) {
+      //     mapping[file.name] = file.webkitRelativePath;
+      //   });
+      //   return mapping;
+      // })(),
+      // beforeSubmit: function(arr, form, options) {
+      //   arr.forEach(function(file) {
+      //     file.value.name = file.value.webkitRelativePath || file.value.name;
+      //     console.log(file);
+      //   });
+      // }
     });
   }
 
   $('#fileUpload').on('change', function(event) {
 
     $('#fileList').empty().append($.map($('#fileUpload').prop('files'), function(file) {
-      return '<li>' + (file.webkitRelativePath || '') + file.name + '</li>';
+      return '<li>' + (file.webkitRelativePath || file.name) + '</li>';
     }).join(''));
     // var msg = event.target.files.map(function(file) {return file.name;}).join(" ,");
     // console.log(msg);

@@ -18,8 +18,8 @@ Work in progress. Main functions in `main.js`, to be built into a full-fledged a
     - [ ] display file hierarchy uploaded to flickr
     - [x] allow user to upload async. (AJAX)
         - workflow: click upload button -> user selects file/folder -> move to raw_files folder -> upload() -> clear raw_files and upload folders
-        - [ ] maintain folder hierarchy when uploading folders to raw_files
-        - replace existings files (waiting for flickrapi to add that in...)
+        - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
+        - [ ] replace existings files (waiting for flickrapi to add that in...)
     - [ ] allow user to download
         - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear raw_files and download folders
     - [ ] allow user to upsync (native client only?)
