@@ -12,7 +12,7 @@ var storage = multer.diskStorage({
     cb(null, file.originalname)
   }
 });
-var upload   =   multer({storage: storage});
+var upload   =   multer({storage});
 
 app.use('/api/upload', upload.any());
 

@@ -17,7 +17,7 @@ var flickrOptions = {
 var photoset_ids = {}; //name : id
 var photo_ids = {}; //photoset: {photoname : id}
 
-"""
+/**
 Basic documentation
 _________
 
@@ -28,7 +28,7 @@ upload(folderName) -> uploads everything in ./upload/$(folderName) to Flickr
 upload(folderName, file) -> uploads ./upload/$(folderName)/$(file) to Flickr
 download(photoset_id) -> downloads photoset from Flickr
 download(photoset_id, photo_id) -> downloads photo inside photoset from Flickr
-"""
+**/
 
 
 Flickr.authenticate(flickrOptions, function(error, flickr) {
@@ -63,7 +63,7 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
 // files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting
 // hide all files in raw_files (or specific path) into stega-files and move to upload
 function convert() {
-  //basically run convertToStega on every file/folder in raw_files
+  // run convertToStega on every file/folder in raw_files
   fs.readdir(path.join(__dirname, 'raw_files'), function(err, items) {
     // get rid of hidden files
     items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join('raw_files', item)});

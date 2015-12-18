@@ -11,7 +11,6 @@ Work in progress. Main functions in `main.js`, to be built into a full-fledged a
 # To-do
 - [x] upload workflow (everything in raw_files -> upload)
 - [x] download either individual file or photoset, sort out logic for that
-- es6/babel
 - [ ] web app
   - [x] basic server
   - [ ] basic UI/front-end (react)
@@ -27,6 +26,7 @@ Work in progress. Main functions in `main.js`, to be built into a full-fledged a
         - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear raw_files and download folders
     - [ ] allow user to upsync (native client only?)
     - [ ] allow user to downsync (native clinet only?)
+- [ ] es6/babel
 
 # Disclaimer
 I am not responsible for anything that happens to your Flickr account when you use StegaStore.
