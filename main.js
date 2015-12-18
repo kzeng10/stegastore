@@ -8,7 +8,7 @@ var secret = require('./secret.js');
 var flickrOptions = {
   api_key: secret.api_key,
   secret: secret.secret,
-  permissions: 'write',
+  permissions: 'delete',
   user_id: 'me',
   authenticated: true
 };
@@ -21,6 +21,7 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
   _.extend(flickrOptions, flickr.options);
   upload = upload.bind(this, flickr);
   download = download.bind(this, flickr);
+  deleteEverything = deleteEverything.bind(this, flickr);
   //update photoset_ids
   flickr.photosets.getList(flickrOptions, function(error, results) {
     results.photosets.photoset.forEach(function(meta) {
@@ -36,10 +37,11 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
     // convertToStega('Photos-2 copy', 'testing1');
     // convertToStega('test1.pdf');
   });
+  // setTimeout(deleteEverything, 1000);
   // upload('testing1');
   // upload('root', 'test1.pdf.png');
-  // download('72157662528655195');
-  download('72157662528655195', '23448717979');
+  // download('72157660179585674');
+  // download('72157662347009042', '23709554182');
 });
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
@@ -196,6 +198,17 @@ function shellhelper(callback, error, stdout, stderr) {
   callback();
 }
 
+// delete everything
+function deleteEverything(flickr) {
+  console.log(photo_ids);
+  Object.keys(photo_ids).forEach(function(photoset) {
+    Object.keys(photo_ids[photoset]).forEach(function(photo) {
+      flickr.photos.delete(_.extend(flickrOptions, {photo_id: photo_ids[photoset][photo]}), function(error, result) {
+        console.log("deleted photo", photo_ids[photoset][photo]);
+      });
+    });
+  });
+}
 // downloads what you don't have locally, use this to sync?
 // Flickr.authenticate(flickrOptions, Flickr.downsync());
 
