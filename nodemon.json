@@ -1,0 +1,6 @@
+{
+    "events": {
+        "restart" :"webpack"
+    },
+    "ignore": ["dist/*"]
+}
