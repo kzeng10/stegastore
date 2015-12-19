@@ -11,18 +11,29 @@ class DropzoneArea extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      files: []
+      files: [],
+      percent: 0
     };
   }
 
   onDrop(files, callback){
-    var req = request.post('/api/upload');
+    var req = request.post('/api/upload').on('progress', (e) => {
+      console.log(`${e.percent} uploaded`);
+      this.setState({percent: parseInt(e.percent)});
+    });
     // var {files} = this.state;
     files.forEach( (file) => {
       console.log(file);
       req.attach(file.name, file, file.name);
     });
-    req.end();
+    req.end( (res) => {
+      console.log(res);
+      // if(res.ok) {
+      //   console.log('Success in uploading files', res);
+      // } else {
+      //   console.log('Error', res);
+      }
+    )
     this.setState({files: files.map((file) => {return file.name;})});
   }
 
@@ -32,7 +43,7 @@ class DropzoneArea extends Component {
         <Dropzone onDrop={this.onDrop.bind(this)}>
           <div>Try dropping some files here, or click to select files to upload.</div>
         </Dropzone>
-        <FileList files={this.state.files} />
+        <FileList files={this.state.files} percent={this.state.percent}/>
       </div>
     );
   }
@@ -47,6 +58,7 @@ class FileList extends Component {
     return(
       <div>
         <h2>Uploaded files:</h2>
+        <h3>Progress: {this.props.percent}%</h3>
         <ul>
           {this.props.files.map((file) => {return <li id={file}>{file}</li>;})}
         </ul>
