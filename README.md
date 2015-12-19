@@ -32,6 +32,7 @@ Work in progress. Main functions in `main.js`.
     - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
         - react doesn't (currently) support webkitdirectory as a DOM property
     - [ ] handle incomplete file uploads (busboy?)
+    - [ ] shard large files, create logic to handle that
 
 
 # Disclaimer
