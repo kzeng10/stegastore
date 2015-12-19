@@ -17,11 +17,15 @@ class DropzoneArea extends Component {
   }
 
   onDrop(files, callback){
+    if(files.some((file) => {return file.size > 195*1024*1024;})) {
+      //alert the user that one of their files exceeds capacity
+      console.log(`At least one of your files exceeds file size maximum`);
+      return;
+    }
     var req = request.post('/api/upload').on('progress', (e) => {
       console.log(`${e.percent} uploaded`);
       this.setState({percent: parseInt(e.percent)});
     });
-    // var {files} = this.state;
     files.forEach( (file) => {
       console.log(file);
       req.attach(file.name, file, file.name);
