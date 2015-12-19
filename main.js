@@ -12,8 +12,8 @@ var flickrOptions = {
   user_id: 'me',
   authenticated: true
 };
+
 //because flickr is dumb and only gives ids, no names
-//perhaps use postgres?
 var photoset_ids = {}; //name : id
 var photo_ids = {}; //photoset: {photoname : id}
 
@@ -62,6 +62,11 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
 // files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting
 // hide all files in raw_files (or specific path) into stega-files and move to upload
+
+// LIKELY NOT GOING TO USE THIS MUCH
+// To keep the app dynamic, we can't have an "upsync" button that converts everything in raw_files
+// You want to be able to upload multiple things at the same time.
+// Hence, use convertToStega(file, parentFolder) more often
 function convert() {
   // run convertToStega on every file/folder in raw_files
   fs.readdir(path.join(__dirname, 'raw_files'), function(err, items) {
@@ -120,6 +125,7 @@ function convertToStega(item, parentFolder) {
         exec('rm "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
           console.log('finished!');
           // upload(parentFolder, parentFolder); //keep photoset names the same as their folder name
+          // upload(parentFolder, item); //probably going to use this more often, upload individual file then delete it from upload and raw_files
         }));
       }));
     }));
@@ -153,6 +159,9 @@ function upload(flickr, folderName, file) {
         }),
           function(error) { if(error) console.log(error);}
         );
+
+        //remove file/folder from upload and raw_files
+
       });
     } else {
       //create photoset with first image, then add rest in
@@ -165,6 +174,9 @@ function upload(flickr, folderName, file) {
           }),
             function(error) { if(error) console.log(error.stack());}
           );
+
+          //remove file/filder from upload and raw_files
+
         }
       });
     }
