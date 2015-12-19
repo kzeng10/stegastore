@@ -16,6 +16,7 @@ Work in progress. Main functions in `main.js`.
   - [x] basic server
   - [ ] basic UI/front-end (react)
     - [x] drag and drop for upload
+    - [ ] progress bar for uploads
   - interactivity
     - [ ] display file hierarchy uploaded to flickr
         - click to download/navigate
@@ -30,6 +31,7 @@ Work in progress. Main functions in `main.js`.
 - distant future:
     - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
         - react doesn't (currently) support webkitdirectory as a DOM property
+    - [ ] handle incomplete file uploads (busboy?)
 
 
 # Disclaimer
