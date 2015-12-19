@@ -22,7 +22,7 @@ Work in progress. Main functions in `main.js`.
         - click to download/navigate
     - [x] allow user to upload async. (AJAX)
         - workflow: click upload button -> user selects file/folder -> move to raw_files folder -> upload() -> clear raw_files and upload folders
-        - [ ] replace existings files (c/p from utils.js, modify for replace)
+        - [ ] replace existings files (waiting for flickrapi to add that in...)
     - [ ] allow user to download
         - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear raw_files and download folders
     - [ ] allow user to upsync (native client only?)
