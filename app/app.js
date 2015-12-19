@@ -34,7 +34,7 @@ class DropzoneArea extends Component {
       //   console.log('Error', res);
       }
     )
-    this.setState({files: files.map((file) => {return file.name;})});
+    this.setState({files: this.state.files.concat(files.map((file) => {return file.name;}))});
   }
 
   render() {
