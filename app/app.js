@@ -3,7 +3,7 @@ import {default as ReactDOM} from 'react-dom';
 import {default as update} from 'react-addons-update';
 import {default as Dropzone} from 'react-dropzone';
 import {default as request} from 'superagent';
-import {Breadcrumb, BreadcrumbItem, Table, Glyphicon, Input, Row, Col, Grid} from 'react-bootstrap';
+import {Breadcrumb, BreadcrumbItem, Table, Glyphicon, Input, Row, Col, Grid, Navbar} from 'react-bootstrap';
 import {default as FontAwesome} from 'react-fontawesome';
 
 require('babel-polyfill');
@@ -39,13 +39,33 @@ class StegaView extends Component {
 
   render() {
     return(
-      <Grid>
-        <Row>
-          <DirectoryBreadCrumb />
-          <DirectorySearchBar />
-        </Row>
-        <DirectoryTable {...this.state} />
-      </Grid>
+      <div>
+        <NavMain />
+        <Grid>
+          <Row>
+            <DirectoryBreadCrumb />
+            <DirectorySearchBar />
+          </Row>
+          <DirectoryTable {...this.state} />
+        </Grid>
+      </div>
+    );
+  }
+}
+
+class NavMain extends Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+        <Navbar fixedTop>
+          <Navbar.Header>
+            <Navbar.Brand>StegaStore</Navbar.Brand>
+          </Navbar.Header>
+        </Navbar>
     );
   }
 }
