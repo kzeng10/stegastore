@@ -9,6 +9,28 @@ require('babel-polyfill');
 
 class StegaView extends Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      // populate directory with event from socket.io
+      directory: new Set(), //folder: {fileName: file, folderName: {fileName: file, zippedFolder: folder}}
+
+    }
+  }
+
+  componentWillMount() {
+    this.socket = io();
+    this.socket.on('hello', () => {
+      this.socket.emit('hello');
+      console.log('hello');
+    });
+    this.socket.on('connection', () => {
+      this.socket.emit('hello');
+      console.log('hello');
+    })
+    // this.socket.emit('hello');
+  }
+
   render() {
     return(
       <Grid>
