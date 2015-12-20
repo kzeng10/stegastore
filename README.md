@@ -36,6 +36,7 @@ Work in progress. Main functions in `main.js`.
         - [ ] handle incomplete file uploads (busboy?)
         - [ ] shard large files, create logic to handle that
     - frontend-ish
+        - [ ] scrollable table instead of sticky navbar
         - [ ] page for entering flickr api keys
         - [ ] store credentials in cookies
 
