@@ -115,13 +115,13 @@ function convert() {
 
 // hide individual file/folder at given dir into a stega-file and move to upload, then uploads
 function convertToStega(item, parentFolder) {
-  var n = parseInt(Math.random() * 10);
+  var n = parseInt(Math.random() * 23);
   // create .tmp/parentFolder and parentFolder in upload
   exec('mkdir -p "'+path.join('upload/.tmp/'+(parentFolder || 'root'))+'" ; '+'mkdir "'+path.join('upload/'+(parentFolder || 'root'))+'"', shellhelper.bind(this, function() {
     // zip folder and move to tmp
     exec('zip -r "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item)+'.zip" "'+path.join('raw_files/'+(parentFolder || ''), item)+'"', shellhelper.bind(this, function() {
       // stegafy the zip file in tmp
-      exec(`cat nyancat/cat${n}.png "${path.join('upload/.tmp/'+(parentFolder || 'root'), item)}.zip" > "${path.join('upload/'+(parentFolder || 'root'), item+'.png')}"`, shellhelper.bind(this, function() {
+      exec(`cat stegosaurus/steg${n}.png "${path.join('upload/.tmp/'+(parentFolder || 'root'), item)}.zip" > "${path.join('upload/'+(parentFolder || 'root'), item+'.png')}"`, shellhelper.bind(this, function() {
         // remove old file in tmp
         exec('rm "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
           console.log('finished!');
