@@ -25,8 +25,6 @@ Work in progress. Main functions in `main.js`.
         - [ ] replace existings files (c/p from utils.js, modify for replace)
     - [ ] allow user to download
         - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear raw_files and download folders
-    - [ ] allow user to upsync (native client only?)
-    - [ ] allow user to downsync (native clinet only?)
 - [x] es6/babel
 - distant future:
     - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
