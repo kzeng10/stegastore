@@ -31,33 +31,33 @@ download(photoset_id, photo_id) -> downloads photo inside photoset from Flickr
 **/
 
 
-Flickr.authenticate(flickrOptions, function(error, flickr) {
-  _.extend(flickrOptions, flickr.options);
-  upload = upload.bind(this, flickr);
-  download = download.bind(this, flickr);
-  deleteEverything = deleteEverything.bind(this, flickr);
-  //update photoset_ids
-  flickr.photosets.getList(flickrOptions, function(error, results) {
-    results.photosets.photoset.forEach(function(meta) {
-      photoset_ids[meta.title._content] =  meta.id;
-      photo_ids[meta.title._content] = {};
-      flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
-        results.photoset.photo.forEach(function(photo) {
-          photo_ids[meta.title._content][photo.title] = photo.id;
-        });
-      })
-    });
-    // convertToStega('0926151802.jpg', 'Photos-3');
-    // convertToStega('Photos-2 copy', 'testing1');
-    // convertToStega('test1.pdf');
-  });
-  // upload('root');
-  // setTimeout(deleteEverything, 5000);
-  // upload('testing1');
-  // upload('root', 'test1.pdf.png');
-  // download('72157660179585674');
-  // download('72157662347009042', '23709554182');
-});
+// Flickr.authenticate(flickrOptions, function(error, flickr) {
+//   _.extend(flickrOptions, flickr.options);
+//   upload = upload.bind(this, flickr);
+//   download = download.bind(this, flickr);
+//   deleteEverything = deleteEverything.bind(this, flickr);
+//   //update photoset_ids
+//   flickr.photosets.getList(flickrOptions, function(error, results) {
+//     results.photosets.photoset.forEach(function(meta) {
+//       photoset_ids[meta.title._content] =  meta.id;
+//       photo_ids[meta.title._content] = {};
+//       flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
+//         results.photoset.photo.forEach(function(photo) {
+//           photo_ids[meta.title._content][photo.title] = photo.id;
+//         });
+//       })
+//     });
+//   });
+//   setTimeout(() => {
+//     console.log(photo_ids);
+//   }, 5000);
+//   // upload('root');
+//   // setTimeout(deleteEverything, 5000);
+//   // upload('Photos-3');
+//   // upload('root', 'test1.pdf.png');
+//   // download('72157660179585674');
+//   // download('72157662347009042', '23709554182');
+// });
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
 // files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting
@@ -115,12 +115,13 @@ function convert() {
 
 // hide individual file/folder at given dir into a stega-file and move to upload, then uploads
 function convertToStega(item, parentFolder) {
+  var n = parseInt(Math.random() * 10);
   // create .tmp/parentFolder and parentFolder in upload
   exec('mkdir -p "'+path.join('upload/.tmp/'+(parentFolder || 'root'))+'" ; '+'mkdir "'+path.join('upload/'+(parentFolder || 'root'))+'"', shellhelper.bind(this, function() {
     // zip folder and move to tmp
     exec('zip -r "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item)+'.zip" "'+path.join('raw_files/'+(parentFolder || ''), item)+'"', shellhelper.bind(this, function() {
       // stegafy the zip file in tmp
-      exec('cat Unknown.png "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item)+'.zip" > "'+path.join('upload/'+(parentFolder || 'root'), item+'.png')+'"', shellhelper.bind(this, function() {
+      exec(`cat nyancat/cat${n}.png "${path.join('upload/.tmp/'+(parentFolder || 'root'), item)}.zip" > "${path.join('upload/'+(parentFolder || 'root'), item+'.png')}"`, shellhelper.bind(this, function() {
         // remove old file in tmp
         exec('rm "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
           console.log('finished!');
@@ -131,6 +132,10 @@ function convertToStega(item, parentFolder) {
     }));
   }));
 }
+// convertToStega('0926151802.jpg', 'Photos-3');
+// convertToStega('Photos-2 copy', 'testing1');
+// convertToStega('test1.pdf');
+
 
 // upload everything (or specified file) in specified folder to specified photoset (of the same name)
 function upload(flickr, folderName, file) {
