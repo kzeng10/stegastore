@@ -16,25 +16,30 @@ Work in progress. Main functions in `main.js`.
   - [x] basic server
   - [x] basic UI/front-end (react+bootstrap)
     - [ ] drag and drop for upload
-    - [ ] progress bar for uploads
+    - [ ] progress bar for each file
   - authentication
     - [ ] authenticate flickr account on socket connect
-    - [ ] store credentials in cookies
   - interactivity
     - [x] display file hierarchy uploaded to flickr
     - [ ] click to download/navigate
     - [ ] allow user to upload async. (AJAX)
-        - workflow: click upload button -> user selects file/folder -> move to raw_files folder -> upload() -> clear raw_files and upload folders
+        - workflow: click upload button -> user selects file/folder (or drag/drop) -> move to raw_files folder -> upload() -> clear copies of files in raw_files and upload folders
         - [ ] replace existings files (c/p from utils.js, modify for replace)
     - [ ] allow user to download
-        - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear raw_files and download folders
+        - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear file copies in raw_files and download folders
 - [x] es6/babel
 - distant future:
-    - [ ] search bar functionality
-    - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
-        - react doesn't (currently) support webkitdirectory as a DOM property
-    - [ ] handle incomplete file uploads (busboy?)
-    - [ ] shard large files, create logic to handle that
+    - backend-ish
+        - [ ] search bar functionality
+        - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
+            - react doesn't (currently) support webkitdirectory as a DOM property
+        - [ ] handle incomplete file uploads (busboy?)
+        - [ ] shard large files, create logic to handle that
+    - frontend-ish
+        - [ ] page for entering flickr api keys
+        - [ ] store credentials in cookies
+
+
 
 
 # Disclaimer
