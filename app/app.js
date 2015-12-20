@@ -3,7 +3,7 @@ import {default as ReactDOM} from 'react-dom';
 import {default as update} from 'react-addons-update';
 import {default as Dropzone} from 'react-dropzone';
 import {default as request} from 'superagent';
-import {Breadcrumb, BreadcrumbItem, Table, Glyphicon, Input, Row, Col, Grid, Navbar} from 'react-bootstrap';
+import {Breadcrumb, BreadcrumbItem, Table, Glyphicon, Input, Row, Col, Grid, Navbar, Nav, NavDropdown, MenuItem} from 'react-bootstrap';
 import {default as FontAwesome} from 'react-fontawesome';
 
 require('babel-polyfill');
@@ -15,7 +15,7 @@ class StegaView extends Component {
     this.state = {
       // populate directory with event from socket.io
       directory: {}, //{photoset: {photoname: id}}
-
+      scrollY: 0
     }
   }
 
@@ -24,7 +24,7 @@ class StegaView extends Component {
     this.socket.on('directory', (directory) => {
       this.setState({directory});
     });
-
+    window.addEventListener('scroll', () => {this.setState({scrollY: window.pageYOffset});});
     // this.socket.on('hello', () => {
     //   this.socket.emit('hello');
     //   console.log('hello');
@@ -40,11 +40,11 @@ class StegaView extends Component {
   render() {
     return(
       <div>
-        <NavMain />
+        <NavMain {...this.state}/>
         <Grid>
           <Row>
-            <DirectoryBreadCrumb />
-            <DirectorySearchBar />
+          <Col xs={6} sm={8} md={9}><DirectoryBreadCrumb /></Col>
+          <Col xs={6} sm={4} md={3}><DirectorySearchBar /></Col>
           </Row>
           <DirectoryTable {...this.state} />
         </Grid>
@@ -60,13 +60,37 @@ class NavMain extends Component {
   }
 
   render() {
-    return(
-        <Navbar fixedTop>
-          <Navbar.Header>
-            <Navbar.Brand>StegaStore</Navbar.Brand>
-          </Navbar.Header>
-        </Navbar>
-    );
+    var style = {float: 'left', margin: '7px 10px'};
+    var content =
+    <Navbar fluid>
+      <Grid>
+        <Navbar.Header>
+          <Navbar.Brand>StegaStore</Navbar.Brand>
+        </Navbar.Header>
+        <Nav pullRight>
+          <NavDropdown title="Account">
+            <MenuItem>Settings</MenuItem>
+            <MenuItem>Logout</MenuItem>
+          </NavDropdown>
+        </Nav>
+      </Grid>
+    </Navbar>;
+    if(this.props.scrollY > 50) {
+      content =
+      <Navbar fixedTop fluid>
+        <Grid>
+          <Navbar.Collapse>
+            <Navbar.Header>
+              <Navbar.Brand>StegaStore</Navbar.Brand>
+            </Navbar.Header>
+            <Navbar.Form pullRight>
+              <DirectorySearchBar />
+            </Navbar.Form>
+          </Navbar.Collapse>
+        </Grid>
+      </Navbar>;
+    }
+    return content;
   }
 }
 
@@ -138,16 +162,14 @@ class DirectoryBreadCrumb extends Component {
 
   render() {
     return (
-      <Col xs={6} sm={8} md={9}>
-        <Breadcrumb>
-          <BreadcrumbItem href='#'>
-            Home
-          </BreadcrumbItem>
-          <BreadcrumbItem active>
-            Folder
-          </BreadcrumbItem>
-        </Breadcrumb>
-      </Col>
+      <Breadcrumb>
+        <BreadcrumbItem href='#'>
+          Home
+        </BreadcrumbItem>
+        <BreadcrumbItem active>
+          Folder
+        </BreadcrumbItem>
+      </Breadcrumb>
     );
   }
 }
@@ -160,13 +182,11 @@ class DirectorySearchBar extends Component {
 
   render() {
     return(
-      <Col xs={6} sm={4} md={3}>
-        <Input
-          type="text"
-          placeholder="Search"
-          addonAfter={<Glyphicon glyph="search" />}
-        />
-      </Col>
+      <Input
+        type="text"
+        placeholder="Search"
+        addonAfter={<Glyphicon glyph="search" />}
+      />
     );
   }
 }
