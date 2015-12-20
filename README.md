@@ -17,6 +17,9 @@ Work in progress. Main functions in `main.js`.
   - [x] basic UI/front-end (react+bootstrap)
     - [ ] drag and drop for upload
     - [ ] progress bar for uploads
+  - authentication
+    - [ ] authenticate flickr account on socket connect
+    - [ ] store credentials in cookies
   - interactivity
     - [ ] display file hierarchy uploaded to flickr
     - [ ] click to download/navigate
