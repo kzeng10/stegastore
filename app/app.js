@@ -29,6 +29,11 @@ class StegaView extends Component {
       console.log('hello');
     })
     // this.socket.emit('hello');
+    // keep in mind that this doesn't work. Only server-side receives the "connection" event.
+    // this.socket.on('connection', () => {
+    //   this.socket.emit('hello');
+    //   console.log('hello');
+    // });
   }
 
   render() {
