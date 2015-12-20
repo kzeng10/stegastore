@@ -138,8 +138,8 @@ function upload(flickr, folderName, file) {
   var uploadOptions = {
     photos: fs.readdirSync(folderDir).filter(function (fileName) {return fileName.split('.')[0] !== '' && (file ? fileName === file : true);}).map(function (fileName) {
     return {
-      title: fileName.split('.')[0],
-      tags: [fileName.split('.')[0]],
+      title: fileName.split('.').slice(0,-1).join('.'),
+      tags: [fileName.split('.').slice(0,-1).join('.')],
       is_public: 0,
       is_friend: 0,
       is_family: 0,
