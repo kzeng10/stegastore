@@ -3,7 +3,7 @@ import {default as ReactDOM} from 'react-dom';
 import {default as update} from 'react-addons-update';
 import {default as Dropzone} from 'react-dropzone';
 import {default as request} from 'superagent';
-import {Breadcrumb, BreadcrumbItem, Table} from 'react-bootstrap';
+import {Breadcrumb, BreadcrumbItem, Table, Glyphicon, Input, Row, Col, Grid} from 'react-bootstrap';
 
 require('babel-polyfill');
 
@@ -11,21 +11,52 @@ class StegaView extends Component {
 
   render() {
     return(
-      <Directory />
-
+      <Grid>
+        <DirectoryBreadCrumb />
+        <DirectorySearchBar />
+        <DirectoryView />
+      </Grid>
     );
   }
-
 }
 
-class Directory extends Component {
+class DirectoryView extends Component {
+  //Clicking on file should download
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <Table responsive>
+        <thead>
+          <tr>
+            <th><Glyphicon glyph="star" /></th>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Modified</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><Glyphicon glyph="star" /></td>
+            <td>FileName.jpg</td>
+            <td>103.45 KB</td>
+            <td>Today</td>
+          </tr>
+        </tbody>
+      </Table>
+    );
+  }
+}
+
+class DirectoryBreadCrumb extends Component {
   //Clicking on home should go back to home
   constructor(props) {
     super(props);
   }
 
   render() {
-    console.log(Breadcrumb);
     return (
       <div>
         <Breadcrumb>
@@ -37,6 +68,27 @@ class Directory extends Component {
           </BreadcrumbItem>
         </Breadcrumb>
       </div>
+    );
+  }
+}
+
+class DirectorySearchBar extends Component {
+  //Search through directory react-ively
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <Row>
+        <Col xs={6} sm={4} md={3} xsOffset={6} smOffset={8} mdOffset={9}>
+          <Input
+            type="text"
+            placeholder="Search"
+            addonAfter={<Glyphicon glyph="search" />}
+          />
+        </Col>
+      </Row>
     );
   }
 }
