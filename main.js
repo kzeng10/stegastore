@@ -31,33 +31,33 @@ download(photoset_id, photo_id) -> downloads photo inside photoset from Flickr
 **/
 
 
-// Flickr.authenticate(flickrOptions, function(error, flickr) {
-//   _.extend(flickrOptions, flickr.options);
-//   upload = upload.bind(this, flickr);
-//   download = download.bind(this, flickr);
-//   deleteEverything = deleteEverything.bind(this, flickr);
-//   //update photoset_ids
-//   flickr.photosets.getList(flickrOptions, function(error, results) {
-//     results.photosets.photoset.forEach(function(meta) {
-//       photoset_ids[meta.title._content] =  meta.id;
-//       photo_ids[meta.title._content] = {};
-//       flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
-//         results.photoset.photo.forEach(function(photo) {
-//           photo_ids[meta.title._content][photo.title] = photo.id;
-//         });
-//       })
-//     });
-//   });
-//   setTimeout(() => {
-//     console.log(photo_ids);
-//   }, 5000);
-//   // upload('root');
-//   // setTimeout(deleteEverything, 5000);
-//   // upload('Photos-3');
-//   // upload('root', 'test1.pdf.png');
-//   // download('72157660179585674');
-//   // download('72157662347009042', '23709554182');
-// });
+Flickr.authenticate(flickrOptions, function(error, flickr) {
+  _.extend(flickrOptions, flickr.options);
+  upload = upload.bind(this, flickr);
+  download = download.bind(this, flickr);
+  deleteEverything = deleteEverything.bind(this, flickr);
+  //update photoset_ids
+  flickr.photosets.getList(flickrOptions, function(error, results) {
+    results.photosets.photoset.forEach(function(meta) {
+      photoset_ids[meta.title._content] =  meta.id;
+      photo_ids[meta.title._content] = {};
+      flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
+        results.photoset.photo.forEach(function(photo) {
+          photo_ids[meta.title._content][photo.title] = photo.id;
+        });
+      })
+    });
+  });
+  setTimeout(() => {
+    console.log(photo_ids);
+  }, 5000);
+  // upload('root');
+  // setTimeout(deleteEverything, 5000);
+  // upload('Photos-3');
+  // upload('root', 'test1.pdf.png');
+  // download('72157660179585674');
+  // download('72157662347009042', '23709554182');
+});
 
 // because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
 // files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting

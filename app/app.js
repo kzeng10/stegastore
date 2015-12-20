@@ -4,6 +4,7 @@ import {default as update} from 'react-addons-update';
 import {default as Dropzone} from 'react-dropzone';
 import {default as request} from 'superagent';
 import {Breadcrumb, BreadcrumbItem, Table, Glyphicon, Input, Row, Col, Grid} from 'react-bootstrap';
+import {default as FontAwesome} from 'react-fontawesome';
 
 require('babel-polyfill');
 
@@ -13,21 +14,21 @@ class StegaView extends Component {
     super(props);
     this.state = {
       // populate directory with event from socket.io
-      directory: new Set(), //folder: {fileName: file, folderName: {fileName: file, zippedFolder: folder}}
+      directory: {}, //{photoset: {photoname: id}}
 
     }
   }
 
   componentWillMount() {
     this.socket = io();
-    this.socket.on('hello', () => {
-      this.socket.emit('hello');
-      console.log('hello');
+    this.socket.on('directory', (directory) => {
+      this.setState({directory});
     });
-    this.socket.on('connection', () => {
-      this.socket.emit('hello');
-      console.log('hello');
-    })
+
+    // this.socket.on('hello', () => {
+    //   this.socket.emit('hello');
+    //   console.log('hello');
+    // });
     // this.socket.emit('hello');
     // keep in mind that this doesn't work. Only server-side receives the "connection" event.
     // this.socket.on('connection', () => {
@@ -39,38 +40,70 @@ class StegaView extends Component {
   render() {
     return(
       <Grid>
-        <DirectoryBreadCrumb />
-        <DirectorySearchBar />
-        <DirectoryView />
+        <Row>
+          <DirectoryBreadCrumb />
+          <DirectorySearchBar />
+        </Row>
+        <DirectoryTable {...this.state} />
       </Grid>
     );
   }
 }
 
-class DirectoryView extends Component {
+class DirectoryTable extends Component {
   //Clicking on file should download
   constructor(props) {
     super(props);
   }
 
   render() {
+    var rows = Object.keys(this.props.directory).map((photoset) => {
+      if(photoset === 'root') {
+        var rootfiles = Object.keys(this.props.directory.root).map((rootfile) => {
+          var glyph = <Glyphicon glyph='file' />;
+          switch(rootfile.split('.').slice(-1)[0]) {
+            case 'jpg':
+            case 'png':
+            case 'jpeg':
+            case 'gif':
+              glyph = <Glyphicon glyph='picture' />;
+              break;
+            case 'pdf':
+              glyph = <FontAwesome className='fa fa-file-pdf-o' name='rootfile'/>;
+              break;
+            //add more cases here...
+          }
+          return (
+            <tr>
+              <td>{glyph}</td>
+              <td>{rootfile}</td>
+              <td>Today</td>
+            </tr>
+          );
+        });
+        return rootfiles;
+      } else {
+        return (
+          <tr>
+            <td><Glyphicon glyph="folder-close" /></td>
+            <td>{photoset}</td>
+            <td>Today</td>
+          </tr>
+        );
+      }
+    });
+
     return(
-      <Table responsive>
+      <Table responsive hover>
         <thead>
           <tr>
             <th><Glyphicon glyph="star" /></th>
             <th>Name</th>
-            <th>Size</th>
             <th>Modified</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td><Glyphicon glyph="star" /></td>
-            <td>FileName.jpg</td>
-            <td>103.45 KB</td>
-            <td>Today</td>
-          </tr>
+          {rows}
         </tbody>
       </Table>
     );
@@ -85,7 +118,7 @@ class DirectoryBreadCrumb extends Component {
 
   render() {
     return (
-      <div>
+      <Col xs={6} sm={8} md={9}>
         <Breadcrumb>
           <BreadcrumbItem href='#'>
             Home
@@ -94,7 +127,7 @@ class DirectoryBreadCrumb extends Component {
             Folder
           </BreadcrumbItem>
         </Breadcrumb>
-      </div>
+      </Col>
     );
   }
 }
@@ -107,15 +140,13 @@ class DirectorySearchBar extends Component {
 
   render() {
     return(
-      <Row>
-        <Col xs={6} sm={4} md={3} xsOffset={6} smOffset={8} mdOffset={9}>
-          <Input
-            type="text"
-            placeholder="Search"
-            addonAfter={<Glyphicon glyph="search" />}
-          />
-        </Col>
-      </Row>
+      <Col xs={6} sm={4} md={3}>
+        <Input
+          type="text"
+          placeholder="Search"
+          addonAfter={<Glyphicon glyph="search" />}
+        />
+      </Col>
     );
   }
 }

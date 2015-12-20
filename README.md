@@ -21,7 +21,7 @@ Work in progress. Main functions in `main.js`.
     - [ ] authenticate flickr account on socket connect
     - [ ] store credentials in cookies
   - interactivity
-    - [ ] display file hierarchy uploaded to flickr
+    - [x] display file hierarchy uploaded to flickr
     - [ ] click to download/navigate
     - [ ] allow user to upload async. (AJAX)
         - workflow: click upload button -> user selects file/folder -> move to raw_files folder -> upload() -> clear raw_files and upload folders
