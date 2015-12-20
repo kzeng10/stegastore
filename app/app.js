@@ -3,8 +3,43 @@ import {default as ReactDOM} from 'react-dom';
 import {default as update} from 'react-addons-update';
 import {default as Dropzone} from 'react-dropzone';
 import {default as request} from 'superagent';
+import {Breadcrumb, BreadcrumbItem, Table} from 'react-bootstrap';
 
 require('babel-polyfill');
+
+class StegaView extends Component {
+
+  render() {
+    return(
+      <Directory />
+
+    );
+  }
+
+}
+
+class Directory extends Component {
+  //Clicking on home should go back to home
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    console.log(Breadcrumb);
+    return (
+      <div>
+        <Breadcrumb>
+          <BreadcrumbItem href='#'>
+            Home
+          </BreadcrumbItem>
+          <BreadcrumbItem active>
+            Folder
+          </BreadcrumbItem>
+        </Breadcrumb>
+      </div>
+    );
+  }
+}
 
 class DropzoneArea extends Component {
 
@@ -14,6 +49,10 @@ class DropzoneArea extends Component {
       files: [],
       percent: 0
     };
+  }
+
+  onDragEnter(event) {
+    console.log(event);
   }
 
   onDrop(files, callback){
@@ -44,7 +83,7 @@ class DropzoneArea extends Component {
   render() {
     return (
       <div>
-        <Dropzone onDrop={this.onDrop.bind(this)}>
+        <Dropzone onDrop={this.onDrop.bind(this)} onDragEnter={this.onDragEnter}>
           <div>Try dropping some files here, or click to select files to upload.</div>
         </Dropzone>
         <FileList files={this.state.files} percent={this.state.percent}/>
@@ -72,6 +111,6 @@ class FileList extends Component {
 }
 
 ReactDOM.render(
-  <DropzoneArea/>,
+  <StegaView/>,
   document.getElementById('example')
 );

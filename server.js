@@ -16,6 +16,7 @@ var upload   =   multer({storage, limits: {fileSize: 195*1024*1024}}).any(); //l
 
 app.use('/api/upload', upload);
 app.use('/dist', express.static('dist'));
+app.use('/assets', express.static('node_modules/bootstrap/dist'));
 
 //res.download(file) to download file to user!
 
