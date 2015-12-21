@@ -14,6 +14,7 @@ Work in progress. Main functions in `main.js`.
 - [x] download either individual file or photoset, sort out logic for that
 - [ ] web app
   - [x] basic server
+    - PNGDrive + flickrapi client side for server-less app?
   - [x] basic UI/front-end (react+bootstrap)
     - [ ] drag and drop for upload
     - [ ] progress bar for each file
@@ -44,4 +45,4 @@ Work in progress. Main functions in `main.js`.
 
 
 # Disclaimer
-I am not responsible for anything that happens to your Flickr account when you use StegaStore.
+I am not responsible for anything that happens to your Flickr account.
