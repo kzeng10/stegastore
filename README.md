@@ -12,6 +12,10 @@ Work in progress. Main functions in `main.js`.
 # To-do
 - [x] upload workflow (everything in raw_files -> upload)
 - [x] download either individual file or photoset, sort out logic for that
+- [ ] instead of putting in photosets, why not just title pictures their directory?, e.g. "/foo/bar/document.pdf.png"
+    - titles allow slashes!
+    - no longer necessary to manually move photos into photoset after upload
+    - multiple directories!
 - [ ] web app
   - [x] basic server
     - PNGDrive (convert images to blobs) + flickrapi client side for server-less app?
