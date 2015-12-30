@@ -16,8 +16,21 @@
 <div id="result"></div>
 
 <script src="./dist/pngdrive-min.js"></script>
+<script src="./dist/flickrapi.js"></script>
 
 <script>
+//test auth
+  var flickr = new Flickr({
+    api_key: "c9a25d3ff667ae33ed648eab9eaa24d6",
+    secret: "de24e8e2a3b8654c",
+    permissions: 'delete',
+    user_id: 'me',
+    authenticated: true
+  });
+
+
+
+
   var pngdrive = new PNGDrive();
   var dropEl = document.getElementById("drop");
   var selectEl = document.getElementById("select");
