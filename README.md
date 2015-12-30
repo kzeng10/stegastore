@@ -19,12 +19,11 @@ Work in progress. Main functions in `main.js`.
     - multiple directories!
 - [ ] web app
   - [x] basic server
-    - PNGDrive (convert images to blobs) + flickrapi client side for server-less app?
+    - [ ] authenticate flickr account on socket connect
+    - [ ] PNGDrive (convert images to blobs) to bypass downloading files to server-side
   - [x] basic UI/front-end (react+bootstrap)
     - [ ] drag and drop for upload
     - [ ] progress bar for each file
-  - authentication
-    - [ ] authenticate flickr account on socket connect
   - interactivity
     - [x] display file hierarchy uploaded to flickr
     - [ ] click to download/navigate
