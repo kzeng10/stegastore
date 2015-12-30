@@ -94,7 +94,7 @@ io.on('connection', (socket) => {
 
 
 app.get('/',function(req,res){
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'indexUpload.html'));
 });
 
 app.post('/api/upload', function(req,res){

@@ -1,38 +1,58 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>File upload Node.</title>
-  </head>
-  <body>
-      <form id="uploadForm"
-         enctype="multipart/form-data"
-         action="/api/upload"
-         method="post">
-      <input type="file" name="fileUpload" id="fileUpload" multiple/>
-      <input type="button" value="Upload Image" name="submit" onclick="formSubmit(this)">
-    </form>
-    <span id="status"></span>
-    <ul id="fileList"></ul>
-  </body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
-  <script>
-  function formSubmit(input) {
-    console.log($('#'+input.form.id));
-    $('#'+input.form.id).ajaxSubmit({
-      error: function(xhr) {
-        console.log('Error: ' + xhr.status);
-      },
-      success: function(response) {
-        $("#status").empty().text("Finished uploading "+response);
-      }
+<head>
+  <meta charset="utf-8" />
+  <title>File Upload Serverless</title>
+  <style>
+    div { margin-bottom: 10px; }
+    #drop { padding: 20px; border: 2px dashed #888; color: #888; }
+  </style>
+</head>
+<body>
+
+<div id="drop">Drop files here</div>
+<input id="select" type="file" name="files[]" multiple />
+<div id="info"></div>
+<div id="result"></div>
+
+<script src="./dist/pngdrive-min.js"></script>
+
+<script>
+  var pngdrive = new PNGDrive();
+  var dropEl = document.getElementById("drop");
+  var selectEl = document.getElementById("select");
+  var infoEl = document.getElementById("info");
+  var resultEl = document.getElementById("result");
+  dropEl.addEventListener('drop', dropHandler, false);
+  function dropHandler(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var files = event.dataTransfer.files;
+    for (var i = 0, file; file = files[i]; i++) {
+      pngdrive.addFile(file);
+    }
+    pngdrive.encode(function() {
+      var img = this.createImage();
+      var imgDataURL = img.toDataURL();
+      resultEl.innerHTML = '<img src="' + imgDataURL + '" />';
+      var numFiles = this.getFileCount();
+      infoEl.innerHTML = 'Encoded ' + numFiles + ' Files';
     });
   }
-
-  $('#fileUpload').on('change', function(event) {
-
-    $('#fileList').empty().append($.map($('#fileUpload').prop('files'), function(file) {
-      return '<li>' + (file.webkitRelativePath || file.name) + '</li>';
-    }).join(''));
-  });
+  selectEl.addEventListener('change', selectHandler, false);
+  function selectHandler(event) {
+    var fl = event.target.files;
+    for (var i = 0, f; f = fl[i]; i++) {
+      pngdrive.addFile(f);
+    }
+    pngdrive.encode(function() {
+      var img = this.createImage();
+      var imgDataURL = img.toDataURL();
+      resultEl.innerHTML = '<img src="' + imgDataURL + '" />';
+      var numFiles = this.getFileCount();
+      infoEl.innerHTML = 'Encoded ' + numFiles + ' Files';
+    });
+  }
 </script>
+</body>
 </html>

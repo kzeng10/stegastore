@@ -16,7 +16,7 @@ Work in progress. Main functions in `main.js`.
     - replace slashes with html-encoded slash symbol?
     - titles allow slashes!
     - no longer necessary to manually move photos into photoset after upload
-    - multiple directories!
+    - multi-tiered directories!
 - [ ] web app
   - [x] basic server
     - PNGDrive (convert images to blobs) + flickrapi client side for server-less app?
