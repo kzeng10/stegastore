@@ -48,9 +48,8 @@
     pngdrive.encode(function() {
       var img = this.createImage();
       var imgDataURL = img.toDataURL();
-      resultEl.innerHTML = '<img src="' + imgDataURL + '" />';
-      var numFiles = this.getFileCount();
-      infoEl.innerHTML = 'Encoded ' + numFiles + ' Files';
+      console.log("done");
+      //takes roughly 35 seconds to convert 500mb
     });
   }
 </script>

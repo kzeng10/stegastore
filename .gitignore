@@ -3,4 +3,4 @@ node_modules
 secret.js
 raw_files
 upload
-dist
+dist/app.js
