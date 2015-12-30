@@ -20,6 +20,7 @@ Work in progress. Main functions in `main.js`.
 - [ ] web app
   - [x] basic server
     - PNGDrive (convert images to blobs) + flickrapi client side for server-less app?
+        - oauth with flickr on load
   - [x] basic UI/front-end (react+bootstrap)
     - [ ] drag and drop for upload
     - [ ] progress bar for each file
