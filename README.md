@@ -20,7 +20,6 @@ Work in progress. Main functions in `main.js`.
 - [ ] web app
   - [x] basic server
     - [ ] authenticate flickr account on socket connect
-    - [ ] PNGDrive (convert images to blobs) to bypass downloading files to server-side
   - [x] basic UI/front-end (react+bootstrap)
     - [ ] drag and drop for upload
     - [ ] progress bar for each file
@@ -36,6 +35,7 @@ Work in progress. Main functions in `main.js`.
 - distant future:
     - backend-ish
         - [ ] search bar functionality
+        - [ ] PNGDrive (convert images to blobs) to bypass downloading files to server-side
         - [ ] maintain folder hierarchy when uploading folders to raw_files (figure out how to send webkitRelativePath in form data...)
             - react doesn't (currently) support webkitdirectory as a DOM property
         - [ ] handle incomplete file uploads (busboy?)
