@@ -14,8 +14,8 @@ var flickrOptions = {
   authenticated: true
 };
 
-//because flickr is dumb and can't access photos by name
-var photo_ids = {}; //photoname: {id, url_o}
+//local cache
+var photo_ids = {}; //id: {title, url_o}
 
 /**
 Basic documentation
@@ -39,8 +39,8 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
   //update photo_ids
   flickr.people.getPhotos(_.extend(flickrOptions, {extras: 'url_o'}), function(error, results) {
     results.photos.photo.forEach((meta) => {
-      photo_ids[meta.title] = {
-        id: meta.id,
+      photo_ids[meta.id] = {
+        title: meta.title,
         url_o: meta.url_o
       }
     });
@@ -204,12 +204,10 @@ function shellhelper(callback, error, stdout, stderr) {
 
 // delete everything
 function deleteEverything(flickr) {
-  console.log(photo_ids);
-  Object.keys(photo_ids).forEach(function(photoset) {
-    Object.keys(photo_ids[photoset]).forEach(function(photo) {
-      flickr.photos.delete(_.extend(flickrOptions, {photo_id: photo_ids[photoset][photo]}), function(error, result) {
-        console.log("deleted photo", photo_ids[photoset][photo]);
-      });
+  Object.keys(photo_ids).forEach(function(photo_id) {
+    flickr.photos.delete(_.extend(flickrOptions, {photo_id}), function(error, result) {
+      if(error) console.log(error.stack);
+      console.log("deleted photo", photo_ids[photo_id].title);
     });
   });
 }
