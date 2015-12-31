@@ -14,9 +14,8 @@ var flickrOptions = {
   authenticated: true
 };
 
-//because flickr is dumb and only gives ids, no names
-var photoset_ids = {}; //name : id
-var photo_ids = {}; //photoset: {photoname : id}
+//because flickr is dumb and can't access photos by name
+var photo_ids = {}; //photoname: {id, url_o}
 
 /**
 Basic documentation
@@ -37,26 +36,32 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
   upload = upload.bind(this, flickr);
   download = download.bind(this, flickr);
   deleteEverything = deleteEverything.bind(this, flickr);
-  //update photoset_ids
-  flickr.photosets.getList(flickrOptions, function(error, results) {
-    results.photosets.photoset.forEach(function(meta) {
-      photoset_ids[meta.title._content] =  meta.id;
-      photo_ids[meta.title._content] = {};
-      flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
-        results.photoset.photo.forEach(function(photo) {
-          photo_ids[meta.title._content][photo.title] = photo.id;
-        });
-      })
+  //update photo_ids
+  flickr.people.getPhotos(_.extend(flickrOptions, {extras: 'url_o'}), function(error, results) {
+    results.photos.photo.forEach((meta) => {
+      photo_ids[meta.title] = {
+        id: meta.id,
+        url_o: meta.url_o
+      }
     });
+    // results.photosets.photoset.forEach(function(meta) {
+    //   photoset_ids[meta.title._content] =  meta.id;
+    //   photo_ids[meta.title._content] = {};
+    //   flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
+    //     results.photoset.photo.forEach(function(photo) {
+    //       photo_ids[meta.title._content][photo.title] = photo.id;
+    //     });
+    //   })
+    // });
   });
-  // setTimeout(() => {
-  //   console.log(photo_ids);
-  // }, 5000);
-  upload('testing1%2FPhotos-2%20copy%2FSnapchat-8684322450223756621.jpg.png');
+  setTimeout(() => {
+    console.log(photo_ids);
+  }, 5000);
+  // upload('testing1%2FPhotos-2%20copy%2FSnapchat-8684322450223756621.jpg.png');
   // setTimeout(deleteEverything, 5000);
   // upload('Photos-3');
   // upload('root', 'test1.pdf.png');
-  // download('72157660179585674');
+  // download('23451358884');
   // download('72157662347009042', '23709554182');
 });
 
