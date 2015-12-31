@@ -22,26 +22,28 @@ app.use('/dist', express.static('dist'));
 
 //res.download(file) to download file to user!
 
-var dir = {'root':{}};
-function updateDir(photo_ids) {
-  // id: {title, url_o} -> folder1: {folder2: {file1:id1, file2:id2 } }
-  Object.keys(photo_ids).forEach((id) => {
-    var fileDir = photo_ids[id].title.split('/');
-    if(fileDir.length === 1) {
-      dir['root'][fileDir[0]] = id;
-    } else {
-      helper(dir, fileDir, 0, id);
-    }
-  });
+var dir = {};
+// function updateDir(photo_ids) {
+//   // id: {title, url_o} -> folder1: {folder2: {file1:id1, file2:id2 } }, file:id
+//   Object.keys(photo_ids).forEach((id) => {
+//     var fileDir = photo_ids[id].title.split('/');
+//     helper(dir, fileDir, 0, id);
+//   });
 
-  function helper(curdir, filedir, i, id) {
-    if(i === filedir.length-1) {
-      curdir[filedir[i]] = id;
-    } else {
-      if(curdir[filedir[i]] === undefined) curdir[filedir[i]] = {};
-      helper(curdir[filedir[i]], filedir, i+1, id);
-    }
-  }
+//   function helper(curdir, filedir, i, id) {
+//     if(i === filedir.length-1) {
+//       curdir[filedir[i]] = id;
+//     } else {
+//       if(curdir[filedir[i]] === undefined) curdir[filedir[i]] = {};
+//       helper(curdir[filedir[i]], filedir, i+1, id);
+//     }
+//   }
+// }
+
+function updateDir(photo_ids) {
+  Object.keys(photo_ids).forEach((id) => {
+    dir[photo_ids[id].title] = id;
+  });
 }
 
 io.on('connection', (socket) => {

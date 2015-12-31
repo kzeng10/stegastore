@@ -5,6 +5,7 @@ import {default as Dropzone} from 'react-dropzone';
 import {default as request} from 'superagent';
 import {Breadcrumb, BreadcrumbItem, Table, Glyphicon, Input, Row, Col, Grid, Navbar, Nav, NavDropdown, MenuItem} from 'react-bootstrap';
 import {default as FontAwesome} from 'react-fontawesome';
+import {default as _} from 'underscore';
 
 require('babel-polyfill');
 
@@ -98,43 +99,45 @@ class DirectoryTable extends Component {
   //Clicking on file should download
   constructor(props) {
     super(props);
+    this.state = {
+      curDir: ''
+    }
   }
 
   render() {
-    var rows = Object.keys(this.props.directory).map((photoset) => {
-      if(photoset === 'root') {
-        var rootfiles = Object.keys(this.props.directory.root).map((rootfile) => {
-          var glyph = <Glyphicon glyph='file' />;
-          switch(rootfile.split('.').slice(-1)[0]) {
-            case 'jpg':
-            case 'png':
-            case 'jpeg':
-            case 'gif':
-              glyph = <Glyphicon glyph='picture' />;
-              break;
-            case 'pdf':
-              glyph = <FontAwesome className='fa fa-file-pdf-o' name='rootfile'/>;
-              break;
-            //add more cases here...
-          }
-          return (
-            <tr>
-              <td>{glyph}</td>
-              <td>{rootfile}</td>
-              <td>Today</td>
-            </tr>
-          );
-        });
-        return rootfiles;
+    var rows = _.uniq(Object.keys(this.props.directory)
+      .filter((file) => {return file.indexOf(this.state.curDir) === 0;}) //only current directory
+      .map((file) => {return file.split('/')[0];})) //for nested files, show only top-most parent folder
+    .map((file) => {
+      var glyph = <Glyphicon glyph='file' />;
+
+      //check if folder
+      if(this.props.directory[this.state.curDir + file] === undefined) {
+        glyph = <Glyphicon glyph='folder-close' />;
       } else {
-        return (
-          <tr>
-            <td><Glyphicon glyph="folder-close" /></td>
-            <td>{photoset}</td>
-            <td>Today</td>
-          </tr>
-        );
+        //take off .png from the end
+        file = file.split('.').slice(0,-1).join('.');
+
+        switch(file.split('.').slice(-1)[0]) {
+          case 'jpg':
+          case 'png':
+          case 'jpeg':
+          case 'gif':
+            glyph = <Glyphicon glyph='picture' />;
+            break;
+          case 'pdf':
+            glyph = <FontAwesome className='fa fa-file-pdf-o' name='rootfile'/>;
+            break;
+          //add more cases here...
+        }
       }
+      return (
+        <tr>
+          <td>{glyph}</td>
+          <td>{file}</td>
+          <td>Today</td>
+        </tr>
+      );
     });
 
     return(
