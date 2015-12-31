@@ -32,33 +32,33 @@ download(photoset_id, photo_id) -> downloads photo inside photoset from Flickr
 **/
 
 
-// Flickr.authenticate(flickrOptions, function(error, flickr) {
-//   _.extend(flickrOptions, flickr.options);
-//   upload = upload.bind(this, flickr);
-//   download = download.bind(this, flickr);
-//   deleteEverything = deleteEverything.bind(this, flickr);
-//   //update photoset_ids
-//   flickr.photosets.getList(flickrOptions, function(error, results) {
-//     results.photosets.photoset.forEach(function(meta) {
-//       photoset_ids[meta.title._content] =  meta.id;
-//       photo_ids[meta.title._content] = {};
-//       flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
-//         results.photoset.photo.forEach(function(photo) {
-//           photo_ids[meta.title._content][photo.title] = photo.id;
-//         });
-//       })
-//     });
-//   });
-//   // setTimeout(() => {
-//   //   console.log(photo_ids);
-//   // }, 5000);
-//   // upload('root');
-//   // setTimeout(deleteEverything, 5000);
-//   // upload('Photos-3');
-//   // upload('root', 'test1.pdf.png');
-//   // download('72157660179585674');
-//   // download('72157662347009042', '23709554182');
-// });
+Flickr.authenticate(flickrOptions, function(error, flickr) {
+  _.extend(flickrOptions, flickr.options);
+  upload = upload.bind(this, flickr);
+  download = download.bind(this, flickr);
+  deleteEverything = deleteEverything.bind(this, flickr);
+  //update photoset_ids
+  flickr.photosets.getList(flickrOptions, function(error, results) {
+    results.photosets.photoset.forEach(function(meta) {
+      photoset_ids[meta.title._content] =  meta.id;
+      photo_ids[meta.title._content] = {};
+      flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
+        results.photoset.photo.forEach(function(photo) {
+          photo_ids[meta.title._content][photo.title] = photo.id;
+        });
+      })
+    });
+  });
+  // setTimeout(() => {
+  //   console.log(photo_ids);
+  // }, 5000);
+  upload('testing1%2FPhotos-2%20copy%2FSnapchat-8684322450223756621.jpg.png');
+  // setTimeout(deleteEverything, 5000);
+  // upload('Photos-3');
+  // upload('root', 'test1.pdf.png');
+  // download('72157660179585674');
+  // download('72157662347009042', '23709554182');
+});
 
 // one file per image
 // for each file, convertToStega(file); for each folder, convert(folderName)
@@ -68,45 +68,16 @@ function convert() {
   // run convertToStega on every file/folder in raw_files
   recursive('raw_files', function(err, items) {
     // get rid of hidden files
-    items = items.filter(function(item) {return item.split('.')[0] !== '';});
+    items = items.filter(function(item) {return path.basename(item).split('.')[0] !== '';});
     // note that these all contain raw_files/ at the beginning, e.g. raw_files/foo/bar/file.txt
 
     //for each item, convertToStega(item)
     items.forEach((item) => {
       convertToStega(item);
     });
-
-    // files in root
-    // items.filter(function(item) {
-    //   return fs.statSync(item).isFile();
-    // }).forEach(function(file) {
-    //   convertToStega(path.basename(file));
-    // });
-
-    // // folders in root
-    // items.filter(function(item) {
-    //   return fs.statSync(item).isDirectory();
-    // }).forEach(function(parentFolder) {
-    //   fs.readdir(path.join(__dirname, parentFolder), function(err, items) {
-    //     items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join(parentFolder, item)});
-    //     // files in folder
-    //     items.filter(function(item) {
-    //       return fs.statSync(item).isFile();
-    //     }).forEach(function(file) {
-    //       convertToStega(path.basename(file), path.basename(parentFolder));
-    //     });
-
-    //     // folders in folder
-    //     items.filter(function(item) {
-    //       return fs.statSync(item).isDirectory();
-    //     }).forEach(function(folder) {
-    //       convertToStega(path.basename(folder), path.basename(parentFolder));
-    //     });
-    //   });
-    // });
   })
 }
-convert();
+// convert();
 // recursive(path.join('raw_files'), (err, items) => {
 //   items = items.map(function(item) {return item.split('/').slice(1).join('/');}).filter(function(item) {return item.split('.')[0] !== '';});
 //   console.log(items);
@@ -132,59 +103,55 @@ function convertToStega(item) {
     }));
   }));
 }
-// convertToStega('0926151802.jpg', 'Photos-3');
-// convertToStega('Photos-2 copy', 'testing1');
-// convertToStega('test1.pdf');
+// convertToStega('raw_files/test1.pdf');
 
 
-// upload everything (or specified file) in specified folder to specified photoset (of the same name)
-function upload(flickr, folderName, file) {
-  var folderDir = path.join(__dirname, 'upload', folderName);
+// upload specified file (assume file name is already uri-encoded)
+function upload(flickr, file) {
   var uploadOptions = {
-    photos: fs.readdirSync(folderDir).filter(function (fileName) {return fileName.split('.')[0] !== '' && (file ? fileName === file : true);}).map(function (fileName) {
-    return {
-      title: fileName.split('.').slice(0,-1).join('.'),
-      tags: [fileName.split('.').slice(0,-1).join('.')],
+    photos: [{
+      title: decodeURIComponent(file),
+      tags: decodeURIComponent(file),
       is_public: 0,
       is_friend: 0,
       is_family: 0,
-      photo: path.join(folderDir, fileName)
-    }
-  })};
+      photo: path.join('upload', file)
+    }]
+  };
   console.log(uploadOptions);
   Flickr.upload(uploadOptions, flickrOptions, function(error, photo_ids) {
-    console.log('finished uploading', photo_ids, ', now moving to photoset', folderName);
+    console.log('finished uploading', file, 'with photo_id', photo_ids);
     if(error) { console.log(error.stack);}
-    if(folderName && photoset_ids[folderName]) {
-      //move to specified photoset
-      photo_ids.forEach(function (photo_id) {
-        flickr.photosets.addPhoto(_.extend(flickrOptions, {
-          photoset_id: photoset_ids[folderName],
-          photo_id: photo_id
-        }),
-          function(error) { if(error) console.log(error);}
-        );
+    // if(folderName && photoset_ids[folderName]) {
+    //   //move to specified photoset
+    //   photo_ids.forEach(function (photo_id) {
+    //     flickr.photosets.addPhoto(_.extend(flickrOptions, {
+    //       photoset_id: photoset_ids[folderName],
+    //       photo_id: photo_id
+    //     }),
+    //       function(error) { if(error) console.log(error);}
+    //     );
 
-        //remove file/folder from upload and raw_files
+    //     //remove file/folder from upload and raw_files
 
-      });
-    } else {
-      //create photoset with first image, then add rest in
-      flickr.photosets.create(_.extend(flickrOptions, {title: folderName, primary_photo_id: photo_ids[0]}), function(error, result) {
-        if(error) {console.log(error.stack);}
-        for(var i = 1; i<photo_ids.length; i++) {
-          flickr.photosets.addPhoto(_.extend(flickrOptions, {
-            photoset_id: result.photoset.id,
-            photo_id: photo_ids[i]
-          }),
-            function(error) { if(error) console.log(error.stack());}
-          );
+    //   });
+    // } else {
+    //   //create photoset with first image, then add rest in
+    //   flickr.photosets.create(_.extend(flickrOptions, {title: folderName, primary_photo_id: photo_ids[0]}), function(error, result) {
+    //     if(error) {console.log(error.stack);}
+    //     for(var i = 1; i<photo_ids.length; i++) {
+    //       flickr.photosets.addPhoto(_.extend(flickrOptions, {
+    //         photoset_id: result.photoset.id,
+    //         photo_id: photo_ids[i]
+    //       }),
+    //         function(error) { if(error) console.log(error.stack());}
+    //       );
 
-          //remove file/filder from upload and raw_files
+    //       //remove file/filder from upload and raw_files
 
-        }
-      });
-    }
+    //     }
+    //   });
+    // }
   });
 }
 
