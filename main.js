@@ -21,60 +21,65 @@ var photo_ids = {}; //id: {title, url_o}
 Basic documentation
 _________
 
-convertToStega(file) -> turns ./raw_files/$(file) into a stega-file, moves to ./upload/$(encodeURIComponent(file))
-convert() -> applies convertToStega to everything in ./raw_files
+convert(file) -> turns ./raw_files/$(file) into a stega-file, moves to ./upload/$(encodeURIComponent(file))
+convertAll() -> applies convertToStega to everything in ./raw_files
 upload(file) -> uploads ./upload/$(file) to Flickr as decodeURIComponent(file)
 download(photo_id) -> downloads photo from Flickr, access from ./download/raw_files/$(decodeURIComponent(file))
 **/
 
-
-Flickr.authenticate(flickrOptions, function(error, flickr) {
-  _.extend(flickrOptions, flickr.options);
-  upload = upload.bind(this, flickr);
-  download = download.bind(this, flickr);
-  deleteEverything = deleteEverything.bind(this, flickr);
-  //update photo_ids
-  flickr.people.getPhotos(_.extend(flickrOptions, {extras: 'url_o'}), function(error, results) {
-    results.photos.photo.forEach((meta) => {
-      photo_ids[meta.id] = {
-        title: meta.title,
-        url_o: meta.url_o
-      }
+function signin(callback) {
+  Flickr.authenticate(flickrOptions, function(error, flickr) {
+    _.extend(flickrOptions, flickr.options);
+    upload = upload.bind(this, flickr);
+    download = download.bind(this, flickr);
+    deleteEverything = deleteEverything.bind(this, flickr);
+    //update photo_ids
+    flickr.people.getPhotos(_.extend(flickrOptions, {extras: 'url_o'}), function(error, results) {
+      results.photos.photo.forEach((meta) => {
+        photo_ids[meta.id] = {
+          title: meta.title,
+          url_o: meta.url_o
+        }
+      });
+      callback();
+      // console.log(photo_ids);
+      // results.photosets.photoset.forEach(function(meta) {
+      //   photoset_ids[meta.title._content] =  meta.id;
+      //   photo_ids[meta.title._content] = {};
+      //   flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
+      //     results.photoset.photo.forEach(function(photo) {
+      //       photo_ids[meta.title._content][photo.title] = photo.id;
+      //     });
+      //   })
+      // });
     });
-    // results.photosets.photoset.forEach(function(meta) {
-    //   photoset_ids[meta.title._content] =  meta.id;
-    //   photo_ids[meta.title._content] = {};
-    //   flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
-    //     results.photoset.photo.forEach(function(photo) {
-    //       photo_ids[meta.title._content][photo.title] = photo.id;
-    //     });
-    //   })
-    // });
+    // setTimeout(() => {
+    //   console.log(photo_ids);
+    // }, 1000);
+    // upload('testing1%2FPhotos-2%20copy%2FSnapchat-8684322450223756621.jpg.png');
+    // setTimeout(deleteEverything, 500);
+    // upload('Photos-3');
+    // upload('root', 'test1.pdf.png');
+    // setTimeout(() => {
+    //   download('23998206271');
+    // }, 500);
+    // download('72157662347009042', '23709554182');
   });
-  // setTimeout(() => {
-  //   console.log(photo_ids);
-  // }, 1000);
-  // upload('testing1%2FPhotos-2%20copy%2FSnapchat-8684322450223756621.jpg.png');
-  // setTimeout(deleteEverything, 500);
-  // upload('Photos-3');
-  // upload('root', 'test1.pdf.png');
-  setTimeout(() => {
-    download('23998206271');
-  }, 500);
-  // download('72157662347009042', '23709554182');
-});
+}
+// signin();
+
 
 // one file per image
 // hide all files in raw_files (or specific path) into stega-files and move to upload
 
-function convert() {
+function convertAll() {
   // run convertToStega on every file/folder in raw_files
   recursive('raw_files', function(err, items) {
     // get rid of hidden files
     items = items.filter(function(item) {return path.basename(item).split('.')[0] !== '';});
 
     items.forEach((item) => {
-      convertToStega(item);
+      convert(item);
     });
   })
 }
@@ -85,7 +90,7 @@ function convert() {
 // });
 
 // hide individual file/folder at given dir into a stega-file and move to upload, then uploads
-function convertToStega(item) {
+function convert(item) {
   var n = parseInt(Math.random() * 23);
   var file = encodeURIComponent(item.split('/').slice(1).join('/')); //eliminates raw_files at the front and converts to uri component (escapes slashes at least)
   // create upload/ and upload/.tmp
@@ -103,6 +108,18 @@ function convertToStega(item) {
   }));
 }
 // convertToStega('raw_files/nyan1.png')
+
+// upload all in upload
+function uploadAll() {
+  fs.readdir('upload', (err, files) => {
+    files
+    .filter(function(item) {return item.split('.')[0] !== '';})
+    .forEach((item) => {
+      upload(item);
+    });
+  });
+}
+// uploadAll();
 
 // upload specified file (assume file name is already uri-encoded)
 function upload(flickr, file) {
@@ -168,3 +185,15 @@ function deleteEverything(flickr) {
 // downloads what you don't have locally, use this to sync?
 // Flickr.authenticate(flickrOptions, Flickr.downsync());
 
+
+module.exports = {
+  signin,
+  flickrOptions,
+  photo_ids,
+  convertAll,
+  convert,
+  upload,
+  uploadAll,
+  download,
+  deleteEverything
+}
