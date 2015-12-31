@@ -54,14 +54,16 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
     //   })
     // });
   });
-  setTimeout(() => {
-    console.log(photo_ids);
-  }, 5000);
+  // setTimeout(() => {
+  //   console.log(photo_ids);
+  // }, 1000);
   // upload('testing1%2FPhotos-2%20copy%2FSnapchat-8684322450223756621.jpg.png');
   // setTimeout(deleteEverything, 5000);
   // upload('Photos-3');
   // upload('root', 'test1.pdf.png');
-  // download('23451358884');
+  setTimeout(() => {
+    download('23451358884');
+  }, 500);
   // download('72157662347009042', '23709554182');
 });
 
@@ -124,8 +126,8 @@ function upload(flickr, file) {
     }]
   };
   console.log(uploadOptions);
-  Flickr.upload(uploadOptions, flickrOptions, function(error, photo_ids) {
-    console.log('finished uploading', file, 'with photo_id', photo_ids);
+  Flickr.upload(uploadOptions, flickrOptions, function(error, photo_id) {
+    console.log('finished uploading', file, 'with photo_id', photo_id);
     if(error) { console.log(error.stack);}
     // if(folderName && photoset_ids[folderName]) {
     //   //move to specified photoset
@@ -160,36 +162,28 @@ function upload(flickr, file) {
   });
 }
 
-// downloads all photos (or specified photo) of user in specified photoset, then unzips all of them into downloads folder
-function download(flickr, photoset_id, photo_id) {
-  flickr.photosets.getPhotos(_.extend(flickrOptions, {extras: 'url_o', photoset_id: photoset_id}), function(error, result) {
-    if(error) console.log(error.stack);
-    console.log(result);
-    exec('mkdir -p download/.tmp', shellhelper.bind(this, function() {
-      result.photoset.photo
-      .filter(function(photoMeta) {return (photo_id ? photoMeta.id === photo_id : true);})
-      .forEach(function(photoMeta) {
-        console.log(photoMeta);
-        var file = fs.createWriteStream(path.join('download', '.tmp', photoMeta.title));
-        request
-        .get(photoMeta.url_o)
-        .on('error', function(err) {
-          console.log(err);
-        })
-        .pipe(file)
-        .on('finish', function(err) {
-          if(err) console.log(err);
-          else {
-            exec('unzip -u "'+path.join('download','.tmp',photoMeta.title)+'" -d download', shellhelper.bind(this, function() {
-              exec('rm "'+path.join('download','.tmp',photoMeta.title)+'"', shellhelper.bind(this, function() {
-                console.log('removed file '+photoMeta.title);
-              }));
-            }));
-          }
-        });
-      });
-    }));
-  });
+// downloads specified photo, then unzips into downloads folder
+function download(flickr, photo_id) {
+
+  exec('mkdir -p download/.tmp', shellhelper.bind(this, function() {
+    var file = fs.createWriteStream(path.join('download/.tmp', encodeURIComponent(photo_ids[photo_id].title)));
+    request
+    .get(photo_ids[photo_id].url_o)
+    .on('error', function(err) {
+      console.log(err);
+    })
+    .pipe(file)
+    .on('finish', function(err) {
+      if(err) console.log(err);
+      else {
+        exec('unzip -u "'+path.join('download/.tmp',encodeURIComponent(photo_ids[photo_id].title))+'" -d download', shellhelper.bind(this, function() {
+          exec('rm "'+path.join('download/.tmp',encodeURIComponent(photo_ids[photo_id].title))+'"', shellhelper.bind(this, function() {
+            console.log('downloaded file '+photo_ids[photo_id].title);
+          }));
+        }));
+      }
+    });
+  }));
 }
 
 // DRY
