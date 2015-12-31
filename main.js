@@ -21,13 +21,10 @@ var photo_ids = {}; //id: {title, url_o}
 Basic documentation
 _________
 
-convertToStega(file) -> turns ./raw_files/$(file) into a stega-file, moves to ./upload/root/$(file)
-convertToStega(item, parentFolder) -> turns ./raw_files/$(parentFolder)/$(item) into a stega-file, moves to ./upload/$(parentFolder)/$(file)
+convertToStega(file) -> turns ./raw_files/$(file) into a stega-file, moves to ./upload/$(encodeURIComponent(file))
 convert() -> applies convertToStega to everything in ./raw_files
-upload(folderName) -> uploads everything in ./upload/$(folderName) to Flickr
-upload(folderName, file) -> uploads ./upload/$(folderName)/$(file) to Flickr
-download(photoset_id) -> downloads photoset from Flickr
-download(photoset_id, photo_id) -> downloads photo inside photoset from Flickr
+upload(file) -> uploads ./upload/$(file) to Flickr as decodeURIComponent(file)
+download(photo_id) -> downloads photo from Flickr, access from ./download/raw_files/$(decodeURIComponent(file))
 **/
 
 
@@ -58,17 +55,16 @@ Flickr.authenticate(flickrOptions, function(error, flickr) {
   //   console.log(photo_ids);
   // }, 1000);
   // upload('testing1%2FPhotos-2%20copy%2FSnapchat-8684322450223756621.jpg.png');
-  // setTimeout(deleteEverything, 5000);
+  // setTimeout(deleteEverything, 500);
   // upload('Photos-3');
   // upload('root', 'test1.pdf.png');
   setTimeout(() => {
-    download('23451358884');
+    download('23998206271');
   }, 500);
   // download('72157662347009042', '23709554182');
 });
 
 // one file per image
-// for each file, convertToStega(file); for each folder, convert(folderName)
 // hide all files in raw_files (or specific path) into stega-files and move to upload
 
 function convert() {
@@ -76,9 +72,7 @@ function convert() {
   recursive('raw_files', function(err, items) {
     // get rid of hidden files
     items = items.filter(function(item) {return path.basename(item).split('.')[0] !== '';});
-    // note that these all contain raw_files/ at the beginning, e.g. raw_files/foo/bar/file.txt
 
-    //for each item, convertToStega(item)
     items.forEach((item) => {
       convertToStega(item);
     });
@@ -103,15 +97,12 @@ function convertToStega(item) {
         // remove old file in tmp
         exec(`rm "${path.join('upload/.tmp/', file)}.zip"`, shellhelper.bind(this, function() {
           console.log(`finished with ${item}`);
-          // upload(parentFolder, parentFolder); //keep photoset names the same as their folder name
-          // upload(parentFolder, item); //probably going to use this more often, upload individual file then delete it from upload and raw_files
         }));
       }));
     }));
   }));
 }
-// convertToStega('raw_files/test1.pdf');
-
+// convertToStega('raw_files/nyan1.png')
 
 // upload specified file (assume file name is already uri-encoded)
 function upload(flickr, file) {
@@ -129,42 +120,11 @@ function upload(flickr, file) {
   Flickr.upload(uploadOptions, flickrOptions, function(error, photo_id) {
     console.log(`finished uploading ${file} with photo_id ${photo_id}`);
     if(error) { console.error(error.stack);}
-    // if(folderName && photoset_ids[folderName]) {
-    //   //move to specified photoset
-    //   photo_ids.forEach(function (photo_id) {
-    //     flickr.photosets.addPhoto(_.extend(flickrOptions, {
-    //       photoset_id: photoset_ids[folderName],
-    //       photo_id: photo_id
-    //     }),
-    //       function(error) { if(error) console.log(error);}
-    //     );
-
-    //     //remove file/folder from upload and raw_files
-
-    //   });
-    // } else {
-    //   //create photoset with first image, then add rest in
-    //   flickr.photosets.create(_.extend(flickrOptions, {title: folderName, primary_photo_id: photo_ids[0]}), function(error, result) {
-    //     if(error) {console.log(error.stack);}
-    //     for(var i = 1; i<photo_ids.length; i++) {
-    //       flickr.photosets.addPhoto(_.extend(flickrOptions, {
-    //         photoset_id: result.photoset.id,
-    //         photo_id: photo_ids[i]
-    //       }),
-    //         function(error) { if(error) console.log(error.stack());}
-    //       );
-
-    //       //remove file/filder from upload and raw_files
-
-    //     }
-    //   });
-    // }
   });
 }
 
 // downloads specified photo, then unzips into downloads folder
 function download(flickr, photo_id) {
-
   exec('mkdir -p download/.tmp', shellhelper.bind(this, function() {
     var file = fs.createWriteStream(path.join('download/.tmp', encodeURIComponent(photo_ids[photo_id].title)));
     request
