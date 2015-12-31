@@ -12,7 +12,7 @@ Work in progress. Main functions in `main.js`.
 # To-do
 - [x] upload workflow (everything in raw_files -> upload)
 - [x] download either individual file or photoset, sort out logic for that
-- [ ] instead of putting in photosets, why not just title pictures their directory?, e.g. "/foo/bar/document.pdf.png"
+- [x] instead of putting in photosets, why not just title pictures their directory?, e.g. "/foo/bar/document.pdf.png"
     - [x] ignore hidden files
     - [ ] ignore hidden folders
     - [ ] option to ignore hidden files/folders
