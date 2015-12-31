@@ -95,13 +95,13 @@ function convertToStega(item) {
   var n = parseInt(Math.random() * 23);
   var file = encodeURIComponent(item.split('/').slice(1).join('/')); //eliminates raw_files at the front and converts to uri component (escapes slashes at least)
   // create upload/ and upload/.tmp
-  exec('mkdir -p "upload/.tmp/"', shellhelper.bind(this, function() {
+  exec(`mkdir -p "upload/.tmp/"`, shellhelper.bind(this, function() {
     // zip folder and move to tmp
-    exec('zip -r "'+path.join('upload/.tmp/', file)+'.zip" "'+item+'"', shellhelper.bind(this, function() {
+    exec(`zip "${path.join('upload/.tmp/', file)}.zip" "${item}"`, shellhelper.bind(this, function() {
       // stegafy the zip file in tmp
       exec(`cat stegosaurus/steg${n}.png "${path.join('upload/.tmp/', file)}.zip" > "${path.join('upload/', file)}.png"`, shellhelper.bind(this, function() {
         // remove old file in tmp
-        exec('rm "'+path.join('upload/.tmp/', file)+'.zip"', shellhelper.bind(this, function() {
+        exec(`rm "${path.join('upload/.tmp/', file)}.zip"`, shellhelper.bind(this, function() {
           console.log(`finished with ${item}`);
           // upload(parentFolder, parentFolder); //keep photoset names the same as their folder name
           // upload(parentFolder, item); //probably going to use this more often, upload individual file then delete it from upload and raw_files
@@ -127,8 +127,8 @@ function upload(flickr, file) {
   };
   console.log(uploadOptions);
   Flickr.upload(uploadOptions, flickrOptions, function(error, photo_id) {
-    console.log('finished uploading', file, 'with photo_id', photo_id);
-    if(error) { console.log(error.stack);}
+    console.log(`finished uploading ${file} with photo_id ${photo_id}`);
+    if(error) { console.error(error.stack);}
     // if(folderName && photoset_ids[folderName]) {
     //   //move to specified photoset
     //   photo_ids.forEach(function (photo_id) {
@@ -170,14 +170,14 @@ function download(flickr, photo_id) {
     request
     .get(photo_ids[photo_id].url_o)
     .on('error', function(err) {
-      console.log(err);
+      console.error(err);
     })
     .pipe(file)
     .on('finish', function(err) {
-      if(err) console.log(err);
+      if(err) console.error(err);
       else {
-        exec('unzip -u "'+path.join('download/.tmp',encodeURIComponent(photo_ids[photo_id].title))+'" -d download', shellhelper.bind(this, function() {
-          exec('rm "'+path.join('download/.tmp',encodeURIComponent(photo_ids[photo_id].title))+'"', shellhelper.bind(this, function() {
+        exec(`unzip -u "${path.join('download/.tmp',encodeURIComponent(photo_ids[photo_id].title))}" -d download`, shellhelper.bind(this, function() {
+          exec(`rm "${path.join('download/.tmp',encodeURIComponent(photo_ids[photo_id].title))}"`, shellhelper.bind(this, function() {
             console.log('downloaded file '+photo_ids[photo_id].title);
           }));
         }));
@@ -200,7 +200,7 @@ function shellhelper(callback, error, stdout, stderr) {
 function deleteEverything(flickr) {
   Object.keys(photo_ids).forEach(function(photo_id) {
     flickr.photos.delete(_.extend(flickrOptions, {photo_id}), function(error, result) {
-      if(error) console.log(error.stack);
+      if(error) console.error(error.stack);
       console.log("deleted photo", photo_ids[photo_id].title);
     });
   });
