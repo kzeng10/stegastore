@@ -2,6 +2,7 @@ var Flickr = require('flickrapi');
 var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
+var recursive = require('recursive-readdir');
 var request = require('request');
 var exec = require('child_process').exec;
 var secret = require('./secret.js');
@@ -31,100 +32,99 @@ download(photoset_id, photo_id) -> downloads photo inside photoset from Flickr
 **/
 
 
-Flickr.authenticate(flickrOptions, function(error, flickr) {
-  _.extend(flickrOptions, flickr.options);
-  upload = upload.bind(this, flickr);
-  download = download.bind(this, flickr);
-  deleteEverything = deleteEverything.bind(this, flickr);
-  //update photoset_ids
-  flickr.photosets.getList(flickrOptions, function(error, results) {
-    results.photosets.photoset.forEach(function(meta) {
-      photoset_ids[meta.title._content] =  meta.id;
-      photo_ids[meta.title._content] = {};
-      flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
-        results.photoset.photo.forEach(function(photo) {
-          photo_ids[meta.title._content][photo.title] = photo.id;
-        });
-      })
-    });
-  });
-  setTimeout(() => {
-    console.log(photo_ids);
-  }, 5000);
-  // upload('root');
-  // setTimeout(deleteEverything, 5000);
-  // upload('Photos-3');
-  // upload('root', 'test1.pdf.png');
-  // download('72157660179585674');
-  // download('72157662347009042', '23709554182');
-});
+// Flickr.authenticate(flickrOptions, function(error, flickr) {
+//   _.extend(flickrOptions, flickr.options);
+//   upload = upload.bind(this, flickr);
+//   download = download.bind(this, flickr);
+//   deleteEverything = deleteEverything.bind(this, flickr);
+//   //update photoset_ids
+//   flickr.photosets.getList(flickrOptions, function(error, results) {
+//     results.photosets.photoset.forEach(function(meta) {
+//       photoset_ids[meta.title._content] =  meta.id;
+//       photo_ids[meta.title._content] = {};
+//       flickr.photosets.getPhotos(_.extend(flickrOptions, {photoset_id: meta.id}), function(error, results) {
+//         results.photoset.photo.forEach(function(photo) {
+//           photo_ids[meta.title._content][photo.title] = photo.id;
+//         });
+//       })
+//     });
+//   });
+//   // setTimeout(() => {
+//   //   console.log(photo_ids);
+//   // }, 5000);
+//   // upload('root');
+//   // setTimeout(deleteEverything, 5000);
+//   // upload('Photos-3');
+//   // upload('root', 'test1.pdf.png');
+//   // download('72157660179585674');
+//   // download('72157662347009042', '23709554182');
+// });
 
-// because cloud storage is, imo, used more often for smaller files, e.g. documents and not movies, one file per image
-// files in ./raw_files are considered in the root folder, files in ./raw_files/foo are in the foo folder, folders in ./raw_files/foo are to be zipped before converting
+// one file per image
+// for each file, convertToStega(file); for each folder, convert(folderName)
 // hide all files in raw_files (or specific path) into stega-files and move to upload
 
-// LIKELY NOT GOING TO USE THIS MUCH
-// To keep the app dynamic, we can't have an "upsync" button that converts everything in raw_files
-// You want to be able to upload multiple things at the same time.
-// Hence, use convertToStega(file, parentFolder) more often
 function convert() {
   // run convertToStega on every file/folder in raw_files
-  fs.readdir(path.join(__dirname, 'raw_files'), function(err, items) {
+  recursive('raw_files', function(err, items) {
     // get rid of hidden files
-    items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join('raw_files', item)});
+    items = items.filter(function(item) {return item.split('.')[0] !== '';});
+    // note that these all contain raw_files/ at the beginning, e.g. raw_files/foo/bar/file.txt
 
-    //for each item,
-    //if fileName.split('.')[0] === '', continue (ignore hidden files)
-    //if file, convertToStega(fileName)
-    //if folder, readdir
-    //  for each item,
-    //    if file, convertToStega(itemName, folderName)
-    //    if folder, convertToStega(itemName, folderName)
+    //for each item, convertToStega(item)
+    items.forEach((item) => {
+      convertToStega(item);
+    });
 
     // files in root
-    items.filter(function(item) {
-      return fs.statSync(item).isFile();
-    }).forEach(function(file) {
-      convertToStega(path.basename(file));
-    });
+    // items.filter(function(item) {
+    //   return fs.statSync(item).isFile();
+    // }).forEach(function(file) {
+    //   convertToStega(path.basename(file));
+    // });
 
-    // folders in root
-    items.filter(function(item) {
-      return fs.statSync(item).isDirectory();
-    }).forEach(function(parentFolder) {
-      fs.readdir(path.join(__dirname, parentFolder), function(err, items) {
-        items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join(parentFolder, item)});
-        // files in folder
-        items.filter(function(item) {
-          return fs.statSync(item).isFile();
-        }).forEach(function(file) {
-          convertToStega(path.basename(file), path.basename(parentFolder));
-        });
+    // // folders in root
+    // items.filter(function(item) {
+    //   return fs.statSync(item).isDirectory();
+    // }).forEach(function(parentFolder) {
+    //   fs.readdir(path.join(__dirname, parentFolder), function(err, items) {
+    //     items = items.filter(function(item) {return item.split('.')[0] !== '';}).map(function(item) {return path.join(parentFolder, item)});
+    //     // files in folder
+    //     items.filter(function(item) {
+    //       return fs.statSync(item).isFile();
+    //     }).forEach(function(file) {
+    //       convertToStega(path.basename(file), path.basename(parentFolder));
+    //     });
 
-        // folders in folder
-        items.filter(function(item) {
-          return fs.statSync(item).isDirectory();
-        }).forEach(function(folder) {
-          convertToStega(path.basename(folder), path.basename(parentFolder));
-        });
-      });
-    });
+    //     // folders in folder
+    //     items.filter(function(item) {
+    //       return fs.statSync(item).isDirectory();
+    //     }).forEach(function(folder) {
+    //       convertToStega(path.basename(folder), path.basename(parentFolder));
+    //     });
+    //   });
+    // });
   })
 }
-// convert();
+convert();
+// recursive(path.join('raw_files'), (err, items) => {
+//   items = items.map(function(item) {return item.split('/').slice(1).join('/');}).filter(function(item) {return item.split('.')[0] !== '';});
+//   console.log(items);
+// });
 
 // hide individual file/folder at given dir into a stega-file and move to upload, then uploads
-function convertToStega(item, parentFolder) {
+function convertToStega(item) {
   var n = parseInt(Math.random() * 23);
-  // create .tmp/parentFolder and parentFolder in upload
-  exec('mkdir -p "'+path.join('upload/.tmp/'+(parentFolder || 'root'))+'" ; '+'mkdir "'+path.join('upload/'+(parentFolder || 'root'))+'"', shellhelper.bind(this, function() {
+  var file = encodeURIComponent(item.split('/').slice(1).join('/')); //eliminates raw_files at the front and converts to uri component (escapes slashes at least)
+  // create upload/ and upload/.tmp
+  exec('mkdir -p "upload/.tmp/"', shellhelper.bind(this, function() {
     // zip folder and move to tmp
-    exec('zip -r "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item)+'.zip" "'+path.join('raw_files/'+(parentFolder || ''), item)+'"', shellhelper.bind(this, function() {
+    exec('zip -r "'+path.join('upload/.tmp/', file)+'.zip" "'+item+'"', shellhelper.bind(this, function() {
       // stegafy the zip file in tmp
-      exec(`cat stegosaurus/steg${n}.png "${path.join('upload/.tmp/'+(parentFolder || 'root'), item)}.zip" > "${path.join('upload/'+(parentFolder || 'root'), item+'.png')}"`, shellhelper.bind(this, function() {
+      exec(`cat stegosaurus/steg${n}.png "${path.join('upload/.tmp/', file)}.zip" > "${path.join('upload/', file)}.png"`, shellhelper.bind(this, function() {
         // remove old file in tmp
-        exec('rm "'+path.join('upload/.tmp/'+(parentFolder || 'root'), item+'.zip')+'"', shellhelper.bind(this, function() {
-          console.log('finished!');
+        exec('rm "'+path.join('upload/.tmp/', file)+'.zip"', shellhelper.bind(this, function() {
+          console.log(`finished with ${item}`);
           // upload(parentFolder, parentFolder); //keep photoset names the same as their folder name
           // upload(parentFolder, item); //probably going to use this more often, upload individual file then delete it from upload and raw_files
         }));
@@ -222,10 +222,10 @@ function download(flickr, photoset_id, photo_id) {
 
 // DRY
 function shellhelper(callback, error, stdout, stderr) {
-  console.log('stdout: ' + stdout);
-  console.log('stderr: ' + stderr);
+  // console.log('stdout: ' + stdout);
+  // console.log('stderr: ' + stderr);
   if (error !== null) {
-    console.log('exec error: ' + error);
+    console.error('exec error: ' + error);
   }
   callback();
 }
