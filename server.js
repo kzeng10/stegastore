@@ -22,7 +22,7 @@ app.use('/dist', express.static('dist'));
 
 //res.download(file) to download file to user!
 
-var dir = {};
+var dir = {}; //fullPath: id
 // function updateDir(photo_ids) {
 //   // id: {title, url_o} -> folder1: {folder2: {file1:id1, file2:id2 } }, file:id
 //   Object.keys(photo_ids).forEach((id) => {
@@ -65,6 +65,14 @@ io.on('connection', (socket) => {
 
 app.get('/',function(req,res){
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/download/:file*', (req, res) => {
+  // res.download(path.join(__dirname, decodeURIComponent(req.path)));
+  console.log(dir);
+  flickr.download(dir[decodeURIComponent(req.path.split('/').slice(2).join('/'))+'.png'], () => {
+    res.download(path.join(__dirname, 'download', 'raw_files', decodeURIComponent(req.path.split('/').slice(2).join('/'))));
+  });
 });
 
 app.post('/api/upload', function(req,res){
