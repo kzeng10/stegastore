@@ -30,18 +30,19 @@ download(photo_id) -> downloads photo from Flickr, access from ./download/raw_fi
 function signin(callback) {
   Flickr.authenticate(flickrOptions, function(error, flickr) {
     _.extend(flickrOptions, flickr.options);
-    upload = upload.bind(this, flickr);
-    download = download.bind(this, flickr);
-    deleteEverything = deleteEverything.bind(this, flickr);
+    module.exports.upload = upload.bind(this, flickr);
+    module.exports.download = download.bind(this, flickr);
+    module.exports.deleteEverything = deleteEverything.bind(this, flickr);
     //update photo_ids
     flickr.people.getPhotos(_.extend(flickrOptions, {extras: 'url_o'}), function(error, results) {
+      if(error) console.error(error.stack);
       results.photos.photo.forEach((meta) => {
         photo_ids[meta.id] = {
           title: meta.title,
           url_o: meta.url_o
         }
       });
-      callback();
+      if(callback) callback();
       // console.log(photo_ids);
       // results.photosets.photoset.forEach(function(meta) {
       //   photoset_ids[meta.title._content] =  meta.id;
@@ -141,7 +142,8 @@ function upload(flickr, file) {
 }
 
 // downloads specified photo, then unzips into downloads folder
-function download(flickr, photo_id) {
+function download(flickr, photo_id, callback) {
+  console.log(photo_ids, photo_id);
   exec('mkdir -p download/.tmp', shellhelper.bind(this, function() {
     var file = fs.createWriteStream(path.join('download/.tmp', encodeURIComponent(photo_ids[photo_id].title)));
     request
@@ -156,6 +158,8 @@ function download(flickr, photo_id) {
         exec(`unzip -u "${path.join('download/.tmp',encodeURIComponent(photo_ids[photo_id].title))}" -d download`, shellhelper.bind(this, function() {
           exec(`rm "${path.join('download/.tmp',encodeURIComponent(photo_ids[photo_id].title))}"`, shellhelper.bind(this, function() {
             console.log('downloaded file '+photo_ids[photo_id].title);
+            // request.get('http://localhost:3000/download/'+photo_ids[photo_id].title));
+            if(callback) callback();
           }));
         }));
       }
@@ -192,8 +196,5 @@ module.exports = {
   photo_ids,
   convertAll,
   convert,
-  upload,
-  uploadAll,
-  download,
-  deleteEverything
+  uploadAll
 }
