@@ -69,9 +69,9 @@ app.get('/',function(req,res){
 
 app.get('/download/:file*', (req, res) => {
   // res.download(path.join(__dirname, decodeURIComponent(req.path)));
-  console.log(dir);
-  flickr.download(dir[decodeURIComponent(req.path.split('/').slice(2).join('/'))+'.png'], () => {
-    res.download(path.join(__dirname, 'download', 'raw_files', decodeURIComponent(req.path.split('/').slice(2).join('/'))));
+  console.log(dir, req.path);
+  flickr.download(dir[decodeURIComponent(req.path.split('/').slice(2).join('/'))], () => {
+    res.download(path.join(__dirname, 'download', 'raw_files', decodeURIComponent(req.path.split('/').slice(2).join('/').split('.').slice(0,-1).join('.'))));
   });
 });
 

@@ -135,10 +135,9 @@ class DirectoryTable extends Component {
         file = <a href='#' onClick={handleClick.bind(this)}>{fileName}</a>;
 
       } else {
-        //take off .png from the end
-        file = file.split('.').slice(0,-1).join('.');
 
-        switch(file.split('.').slice(-1)[0]) {
+
+        switch(file.split('.').slice(-2)[0]) {
           case 'jpg':
           case 'png':
           case 'jpeg':
@@ -150,6 +149,9 @@ class DirectoryTable extends Component {
             break;
           //add more cases here...
         }
+
+        //take off .png from the end
+        file = <a href={'/download/'+this.props.curDir+file}>{file.split('.').slice(0,-1).join('.')}</a>;
       }
       return (
         <tr>
