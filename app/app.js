@@ -16,8 +16,21 @@ class StegaView extends Component {
     this.state = {
       // populate directory with event from socket.io
       directory: {}, //{photoset: {photoname: id}}
+      curDir: '', // foo/bar/file.txt
       scrollY: 0
     }
+  }
+
+  openFolder(folder) {
+    this.setState({
+      curDir: this.state.curDir+folder+'/'
+    });
+  }
+
+  goUp(i) {
+    this.setState({
+      curDir: i === 0 ? '' : this.state.curDir.split('/').slice(0,i).join('/')+'/'
+    });
   }
 
   componentWillMount() {
@@ -39,15 +52,16 @@ class StegaView extends Component {
   }
 
   render() {
+    console.log(this.state.curDir);
     return(
       <div>
         <NavMain {...this.state}/>
         <Grid>
           <Row>
-          <Col xs={6} sm={8} md={9}><DirectoryBreadCrumb /></Col>
+          <Col xs={6} sm={8} md={9}><DirectoryBreadCrumb {...this.state} goUp={this.goUp.bind(this)}/></Col>
           <Col xs={6} sm={4} md={3}><DirectorySearchBar /></Col>
           </Row>
-          <DirectoryTable {...this.state} />
+          <DirectoryTable {...this.state} openFolder={this.openFolder.bind(this)} />
         </Grid>
       </div>
     );
@@ -100,34 +114,26 @@ class DirectoryTable extends Component {
   //Clicking on folder should go into folder
   constructor(props) {
     super(props);
-    this.state = {
-      curDir: ''
-    }
-  }
-
-  changeDir(folder) {
-    this.setState({
-      curDir: this.state.curDir+folder+'/'
-    });
-    console.log(this.state.curDir);
   }
 
   render() {
     var rows = _.uniq(Object.keys(this.props.directory)
-      .filter((file) => {return file.indexOf(this.state.curDir) === 0;}) //only current directory
-      .map((file) => {return file.substring(this.state.curDir.length);}) //remove directory prefix
+      .filter((file) => {return file.indexOf(this.props.curDir) === 0;}) //only current directory
+      .map((file) => {return file.substring(this.props.curDir.length);}) //remove directory prefix
       .map((file) => {return file.split('/')[0];})) //for nested files, show only top-most parent folder
     .map((file) => {
       var glyph = <Glyphicon glyph='file' />;
 
       //check if folder
-      if(this.props.directory[this.state.curDir + file] === undefined) {
+      if(this.props.directory[this.props.curDir + file] === undefined) {
         glyph = <Glyphicon glyph='folder-close' />;
-        file = <a href='#' onClick={this.changeDir.bind(this,file)}>{file}</a>;
+        var fileName = file;
+        function handleClick() {
+          this.props.openFolder(fileName);
+        }
 
-        // function updateDir(folder) {
-        //   this.setState({})
-        // }
+        file = <a href='#' onClick={handleClick.bind(this)}>{fileName}</a>;
+
       } else {
         //take off .png from the end
         file = file.split('.').slice(0,-1).join('.');
@@ -178,13 +184,26 @@ class DirectoryBreadCrumb extends Component {
   }
 
   render() {
+    function handleClick(i) {
+      this.props.goUp(i);
+    }
+    var crumbs = this.props.curDir.split('/').map((folder, i, arr) => {
+      if(i >= arr.length-2) return;
+      return (
+        <BreadcrumbItem href='#' onClick={handleClick.bind(this,i+1)}>
+          {folder}
+        </BreadcrumbItem>
+      );
+    })
+
     return (
       <Breadcrumb>
-        <BreadcrumbItem href='#'>
+        <BreadcrumbItem href='#' onClick={handleClick.bind(this,0)}>
           Home
         </BreadcrumbItem>
+        {crumbs}
         <BreadcrumbItem active>
-          Folder
+          {this.props.curDir.split('/').slice(-2)[0]}
         </BreadcrumbItem>
       </Breadcrumb>
     );
