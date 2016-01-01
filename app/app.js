@@ -97,6 +97,7 @@ class NavMain extends Component {
 
 class DirectoryTable extends Component {
   //Clicking on file should download
+  //Clicking on folder should go into folder
   constructor(props) {
     super(props);
     this.state = {
@@ -104,9 +105,17 @@ class DirectoryTable extends Component {
     }
   }
 
+  changeDir(folder) {
+    this.setState({
+      curDir: this.state.curDir+folder+'/'
+    });
+    console.log(this.state.curDir);
+  }
+
   render() {
     var rows = _.uniq(Object.keys(this.props.directory)
       .filter((file) => {return file.indexOf(this.state.curDir) === 0;}) //only current directory
+      .map((file) => {return file.substring(this.state.curDir.length);}) //remove directory prefix
       .map((file) => {return file.split('/')[0];})) //for nested files, show only top-most parent folder
     .map((file) => {
       var glyph = <Glyphicon glyph='file' />;
@@ -114,6 +123,11 @@ class DirectoryTable extends Component {
       //check if folder
       if(this.props.directory[this.state.curDir + file] === undefined) {
         glyph = <Glyphicon glyph='folder-close' />;
+        file = <a href='#' onClick={this.changeDir.bind(this,file)}>{file}</a>;
+
+        // function updateDir(folder) {
+        //   this.setState({})
+        // }
       } else {
         //take off .png from the end
         file = file.split('.').slice(0,-1).join('.');
