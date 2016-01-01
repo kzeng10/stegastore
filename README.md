@@ -21,14 +21,16 @@ Work in progress. Main functions in `main.js`.
     - [ ] authenticate flickr account on socket connect
   - [x] basic UI/front-end (react+bootstrap)
     - [ ] drag and drop for upload
-    - [ ] progress bar for each file
-  - interactivity
+    - progress bar for each file
+        - [ ] upload
+        - [ ] download
+  - interactivity/functionality
     - [x] display file hierarchy uploaded to flickr
-    - [ ] click to download/navigate
+    - [x] click to download/navigate
     - [ ] allow user to upload async. (AJAX)
         - workflow: click upload button -> user selects file/folder (or drag/drop) -> move to raw_files folder -> upload() -> clear copies of files in raw_files and upload folders
         - [ ] replace existings files (c/p from utils.js, modify for replace)
-    - [ ] allow user to download
+    - [x] allow user to download
         - workflow: click file -> download() -> convert to regular file and move to raw_files -> send to user -> clear file copies in raw_files and download folders
 - [x] es6/babel
 - distant future:
