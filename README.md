@@ -2,11 +2,26 @@
 Use Flickr's free 1-terabyte storage for storing files of any kind!
 
 # Install & Use
+### Install deps
 ```
 $ git clone git@github.com:kzeng10/stegastore.git
+$ cd stegastore
 $ npm install
+```
+### Create a secret.js file
+```javascript
+var secret = {
+  api_key: "my_api_key",
+  secret: "my_api_secret" 
+};
+module.exports = secret;
+```
+### Run the server 
+```
 $ npm start
 ```
+#### Visit at localhost:3000
+
 Work in progress. Main functions in `main.js`.
 
 # To-do
