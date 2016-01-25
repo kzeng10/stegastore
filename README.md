@@ -4,6 +4,7 @@ Use Flickr's free 1-terabyte storage for storing files of any kind!
 # Install & Use
 ```
 $ git clone git@github.com:kzeng10/stegastore.git
+$ cd stegastore
 $ npm install
 $ npm start
 ```
